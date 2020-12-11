@@ -2,11 +2,14 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.spec.KeySpec;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
 
@@ -17,12 +20,15 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
     private SecretKey masterSecretKey;
     private SecretKeyFactory factory;
 
+   private List<String> allActiveTokens;
+
     //constructor
     RegistrarIMP() throws RemoteException{
         super();
         facilities=new ArrayList<>();
         secretKeys=new ArrayList<>();
         clients=new ArrayList<>();
+        allActiveTokens=new ArrayList<>();
 
         try{
             //creating rmi registry
@@ -121,7 +127,6 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
     //removing a facility
     @Override
     public void disconnectFacility(String name) {
-
         for(OwnerFacility c : facilities){
             if(c.getName().equals(name)){
                 System.out.println(name + " left the registry \n");
@@ -154,6 +159,36 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
             if(c.getTelephoneNumber().equals(telephoneNumber))return false;
         }
         return true;
+    }
+
+    //generating the new 48 users token for the given client
+    public void generateUserToken(Client c){
+        List<String> actTokens=new ArrayList<>();
+        RandomToken token=new RandomToken();
+
+        String date=java.util.Calendar.getInstance().getTime().toString());
+
+        //generates the 48 tokens
+        //also checks if the token is already used
+        for(int i=0;i<48;i++){
+            String newToken = date+token.nextString();
+            if(!allActiveTokens.contains(newToken)){
+                allActiveTokens.add(newToken);
+                actTokens.add(newToken);
+            }
+        }
+
+        c.shiftActiveTokens();
+        c.setActiveTokens(actTokens);
+
+        //sending the list of pseudonyms to the facility
+        try {
+            Visitor client = ( Visitor ) Naming.lookup("rmi://" + c.getClientAddres() + "/" + c.getClientServiceName());
+            client.setTokens(actTokens);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
