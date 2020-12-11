@@ -2,6 +2,7 @@ import javax.imageio.spi.RegisterableService;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 public class VisitorIMP extends UnicastRemoteObject implements Visitor{
     private String username;
@@ -11,6 +12,8 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor{
     private String clientAddres;
 
     private Registrar registrar;
+
+    private List<String> tokens;
 
     public VisitorIMP(String username,String telephoneNumber) throws RemoteException {
         super();
@@ -45,7 +48,11 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor{
             e.printStackTrace();
         }
 
-
         return false;
+    }
+
+    @Override
+    public void setTokens(List<String> tokens){
+    this.tokens=tokens;
     }
 }

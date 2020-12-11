@@ -2,16 +2,9 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.lang.ref.Cleaner;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 import java.util.*;
 
@@ -29,7 +22,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
         super();
         facilities=new ArrayList<>();
         secretKeys=new ArrayList<>();
-        users=new ArrayList<>();
+        clients=new ArrayList<>();
 
         try{
             //creating rmi registry
@@ -53,6 +46,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
 
 
     //checking if the facility name is already taken
+    @Override
     public boolean checkFacilityName(String name){
         for(OwnerFacility c : facilities){
 
@@ -63,14 +57,16 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
         return true;
     }
 
-    //adding a facility + generating the specialized secret key
+    //adding a facility + generating the pseudonyms
     //details: name, service addres, service name
+    @Override
     public void enrollFacility(String[] details){
         OwnerFacility owner=new OwnerFacility(details[0],details[1],details[2],details[3]);
         facilities.add(owner);
         generatePseudonyms(owner);
     }
 
+    //generate the nessecary pseudonyms for a facility for the coming month (used at the start of the first day)
     public void generatePseudonyms(OwnerFacility owner){
 
         byte[] date=java.util.Calendar.getInstance().getTime().toString().getBytes();
@@ -123,6 +119,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
     }
 
     //removing a facility
+    @Override
     public void disconnectFacility(String name) {
 
         for(OwnerFacility c : facilities){
@@ -135,11 +132,14 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
     }
 
     //adding a visitor
+    @Override
     public void enrollNewUser(String[] details){
         Client client=new Client(details[0],details[1],details[2],details[3]);
         clients.add(client);
     }
 
+    //checking if the username is taken
+    @Override
     public boolean checkUserName(String username){
         for(Client c : clients){
             if(c.getUsername().equals(username))return false;
@@ -147,6 +147,8 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
         return true;
     }
 
+    //checking if the telephone number is taken
+    @Override
     public boolean checkUserTel(String telephoneNumber){
         for(Client c : clients){
             if(c.getTelephoneNumber().equals(telephoneNumber))return false;
