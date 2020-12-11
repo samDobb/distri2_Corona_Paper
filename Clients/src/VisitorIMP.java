@@ -2,6 +2,7 @@ import javax.imageio.spi.RegisterableService;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -16,6 +17,8 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
     private Registrar registrar;
 
     private List<String> tokens;
+    private List<byte[]> signatures;
+    private PublicKey publicKey;
 
     private List<QRcode> qRcodes;
     private List<Calendar> qRtimes;
@@ -24,10 +27,13 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
 
     public VisitorIMP(String username, String telephoneNumber) throws RemoteException {
         super();
+
         this.username = username;
         this.telephoneNumber = telephoneNumber;
+
         qRcodes=new ArrayList<>();
         qRtimes=new ArrayList<>();
+        signatures = new ArrayList<>();
     }
 
     //making connection to the registry and starting the rmi for this facility
@@ -60,9 +66,12 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
         return false;
     }
 
+
     @Override
-    public void setTokens(List<String> tokens) {
+    public void setTokens(List<String> tokens, List<byte[]> signatures, PublicKey publicKey) {
         this.tokens = tokens;
+        this.signatures=signatures;
+        this.publicKey=publicKey;
     }
 
     public void readQr(QRcode qr){

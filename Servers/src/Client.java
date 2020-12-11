@@ -11,6 +11,9 @@ public class Client {
     private List<String> pastTokens;
     private List<String> activeTokens;
 
+    private List<byte[]> signatures;
+
+
     public Client(String username,String tel,String clientServiceName,String clientAddres){
         this.username=username;
         this.telephoneNumber=tel;
@@ -61,4 +64,5 @@ public class Client {
     public void setActiveTokens(List<String> tokens){
         activeTokens=tokens;
     }
+    public void setSignatures(List<byte[]> signatures){this.signatures=signatures;}
 }

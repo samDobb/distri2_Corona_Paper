@@ -7,11 +7,12 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.*;
 import java.security.spec.KeySpec;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
+public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
     private List<OwnerFacility> facilities;
     private List<SecretKey> secretKeys;
@@ -20,17 +21,17 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
     private SecretKey masterSecretKey;
     private SecretKeyFactory factory;
 
-   private List<String> allActiveTokens;
+    private List<String> allActiveTokens;
 
     //constructor
-    RegistrarIMP() throws RemoteException{
+    RegistrarIMP() throws RemoteException {
         super();
-        facilities=new ArrayList<>();
-        secretKeys=new ArrayList<>();
-        clients=new ArrayList<>();
-        allActiveTokens=new ArrayList<>();
+        facilities = new ArrayList<>();
+        secretKeys = new ArrayList<>();
+        clients = new ArrayList<>();
+        allActiveTokens = new ArrayList<>();
 
-        try{
+        try {
             //creating rmi registry
             java.rmi.registry.LocateRegistry.createRegistry(1099);
             System.out.println("Registrar Server ready");
@@ -44,8 +45,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
 
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
             masterSecretKey = keygen.generateKey();
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Server had problems starting");
         }
     }
@@ -53,11 +53,11 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
 
     //checking if the facility name is already taken
     @Override
-    public boolean checkFacilityName(String name){
-        for(OwnerFacility c : facilities){
+    public boolean checkFacilityName(String name) {
+        for (OwnerFacility c : facilities) {
 
-            if(c.getName().equals(name)){
-               return false;
+            if (c.getName().equals(name)) {
+                return false;
             }
         }
         return true;
@@ -66,21 +66,21 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
     //adding a facility + generating the pseudonyms
     //details: name, service addres, service name
     @Override
-    public void enrollFacility(String[] details){
-        OwnerFacility owner=new OwnerFacility(details[0],details[1],details[2],details[3]);
+    public void enrollFacility(String[] details) {
+        OwnerFacility owner = new OwnerFacility(details[0], details[1], details[2], details[3]);
         facilities.add(owner);
         generatePseudonyms(owner);
     }
 
     //generate the nessecary pseudonyms for a facility for the coming month (used at the start of the first day)
-    public void generatePseudonyms(OwnerFacility owner){
+    public void generatePseudonyms(OwnerFacility owner) {
 
-        byte[] date=java.util.Calendar.getInstance().getTime().toString().getBytes();
+        byte[] date = java.util.Calendar.getInstance().getTime().toString().getBytes();
 
-        String name= owner.getName();
+        String name = owner.getName();
         String location = owner.getLocation();
         try {
-            KeySpec spec = new PBEKeySpec(name.toCharArray(),date,1000);
+            KeySpec spec = new PBEKeySpec(name.toCharArray(), date, 1000);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
 
@@ -90,19 +90,19 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
             byte[] iv = cipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
             String encodedLine = Base64.getEncoder().encodeToString(cipher.doFinal(masterSecretKey.getEncoded()));
 
-            int monthMaxDays=Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+            int monthMaxDays = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
 
-            List<String> pseudonyms=new ArrayList<>(monthMaxDays);
+            List<String> pseudonyms = new ArrayList<>(monthMaxDays);
 
-            Calendar c=java.util.Calendar.getInstance();
+            Calendar c = java.util.Calendar.getInstance();
 
             //making a pseudonym for every day for the current month
-            for(int i=0;i<monthMaxDays;i++){
-                c.add(Calendar.DATE,1);
+            for (int i = 0; i < monthMaxDays; i++) {
+                c.add(Calendar.DATE, 1);
 
-                byte[] datePseu=c.getTime().toString().getBytes();
+                byte[] datePseu = c.getTime().toString().getBytes();
 
-                KeySpec keyspec = new PBEKeySpec(location.toCharArray(),datePseu,1000);
+                KeySpec keyspec = new PBEKeySpec(location.toCharArray(), datePseu, 1000);
                 tmp = factory.generateSecret(keyspec);
                 SecretKey secretPseu = new SecretKeySpec(tmp.getEncoded(), "AES");
 
@@ -116,7 +116,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
             }
 
             //sending the list of pseudonyms to the facility
-            BarOwner client = ( BarOwner )Naming.lookup("rmi://" + owner.getClientAddres() + "/" + owner.getClientServiceName());
+            BarOwner client = (BarOwner) Naming.lookup("rmi://" + owner.getClientAddres() + "/" + owner.getClientServiceName());
             client.setPseudonyms(pseudonyms);
 
         } catch (Exception e) {
@@ -127,8 +127,8 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
     //removing a facility
     @Override
     public void disconnectFacility(String name) {
-        for(OwnerFacility c : facilities){
-            if(c.getName().equals(name)){
+        for (OwnerFacility c : facilities) {
+            if (c.getName().equals(name)) {
                 System.out.println(name + " left the registry \n");
                 facilities.remove(c);
                 break;
@@ -138,55 +138,80 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
 
     //adding a visitor
     @Override
-    public void enrollNewUser(String[] details){
-        Client client=new Client(details[0],details[1],details[2],details[3]);
+    public void enrollNewUser(String[] details) {
+        Client client = new Client(details[0], details[1], details[2], details[3]);
         clients.add(client);
     }
 
     //checking if the username is taken
     @Override
-    public boolean checkUserName(String username){
-        for(Client c : clients){
-            if(c.getUsername().equals(username))return false;
+    public boolean checkUserName(String username) {
+        for (Client c : clients) {
+            if (c.getUsername().equals(username)) return false;
         }
         return true;
     }
 
     //checking if the telephone number is taken
     @Override
-    public boolean checkUserTel(String telephoneNumber){
-        for(Client c : clients){
-            if(c.getTelephoneNumber().equals(telephoneNumber))return false;
+    public boolean checkUserTel(String telephoneNumber) {
+        for (Client c : clients) {
+            if (c.getTelephoneNumber().equals(telephoneNumber)) return false;
         }
         return true;
     }
 
     //generating the new 48 users token for the given client
-    public void generateUserToken(Client c){
-        List<String> actTokens=new ArrayList<>();
-        RandomToken token=new RandomToken();
+    public void generateUserToken(Client c) {
 
-        String date=java.util.Calendar.getInstance().getTime().toString();
+        List<String> actTokens = new ArrayList<>();
+        List<byte[]> signatures = new ArrayList<>();
 
-        //generates the 48 tokens
-        //also checks if the token is already used
-        for(int i=0;i<48;i++){
-            String newToken = date+"."+token.nextString();
 
-            if(!allActiveTokens.contains(newToken)){
-                allActiveTokens.add(newToken);
-                actTokens.add(newToken);
-            }
-        }
+        RandomToken token = new RandomToken();
 
-        c.shiftActiveTokens();
-        c.setActiveTokens(actTokens);
+        String date = java.util.Calendar.getInstance().getTime().toString();
 
-        //sending the list of pseudonyms to the facility
+//preparing for the signature
         try {
-            Visitor client = ( Visitor ) Naming.lookup("rmi://" + c.getClientAddres() + "/" + c.getClientServiceName());
-            client.setTokens(actTokens);
-        } catch (Exception e) {
+            //Creating KeyPair generator object
+            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("DSA");
+
+            //Initializing the key pair generator
+            keyPairGen.initialize(2048);
+
+            //Generate the pair of keys
+            KeyPair pair = keyPairGen.generateKeyPair();
+
+            //Getting the privatekey from the key pair
+            PrivateKey privKey = pair.getPrivate();
+            //Creating a Signature object
+            Signature sign = Signature.getInstance("SHA256withDSA");
+            sign.initSign(privKey);
+            //generates the 48 tokens
+            //also checks if the token is already used
+            for (int i = 0; i < 48; i++) {
+
+                String newToken = date + "." + token.nextString();
+                if (!allActiveTokens.contains(newToken)) {
+
+                    sign.update(newToken.getBytes());
+                    signatures.add(sign.sign());
+                    allActiveTokens.add(newToken);
+                    actTokens.add(newToken);
+                }
+            }
+
+
+            c.shiftActiveTokens();
+            c.setActiveTokens(actTokens);
+            c.setSignatures(signatures);
+
+            //sending the list of pseudonyms to the facility
+
+            Visitor client = (Visitor) Naming.lookup("rmi://" + c.getClientAddres() + "/" + c.getClientServiceName());
+            client.setTokens(actTokens, signatures, pair.getPublic() );
+        }catch (Exception e) {
             e.printStackTrace();
         }
 
