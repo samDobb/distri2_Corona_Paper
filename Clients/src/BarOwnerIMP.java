@@ -1,8 +1,16 @@
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-
+import java.security.spec.KeySpec;
+import java.util.Base64;
+import java.util.List;
 
 
 public class BarOwnerIMP extends UnicastRemoteObject implements BarOwner {
@@ -13,12 +21,16 @@ public class BarOwnerIMP extends UnicastRemoteObject implements BarOwner {
     private int telephoneNumber;
 
     private String bussinesName;
-    private String bussisnesAddres;
+    private String bussinesAddres;
 
     private String clientServiceName;
     private String clientAddres;
 
     private Registrar registrar;
+
+    private List<String> pseudonyms;
+
+    private QRcode qrcode;
 
 
     //constructor
@@ -51,12 +63,12 @@ public class BarOwnerIMP extends UnicastRemoteObject implements BarOwner {
         this.bussinesName = bussinesName;
     }
 
-    public String getBussisnesAddres() {
-        return bussisnesAddres;
+    public String getBussinesAddres() {
+        return bussinesAddres;
     }
 
-    public void setBussisnesAddres(String bussisnesAddres) {
-        this.bussisnesAddres = bussisnesAddres;
+    public void setBussinesAddres(String bussisnesAddres) {
+        this.bussinesAddres = bussisnesAddres;
     }
 
     //making connection to the registry and starting the rmi for this facility
@@ -76,7 +88,7 @@ public class BarOwnerIMP extends UnicastRemoteObject implements BarOwner {
                 System.out.println(bussinesName+" is running\n");
 
                 //registering this facility to the registrar
-                String[] details = {bussinesName,clientAddres,clientServiceName};
+                String[] details = {bussinesName,bussinesAddres,clientServiceName,clientAddres};
                 registrar.enrollFacility(details);
 
                 return true;
@@ -100,5 +112,37 @@ public class BarOwnerIMP extends UnicastRemoteObject implements BarOwner {
             System.out.println("facility disconnected");
             e.printStackTrace();
         }
+    }
+
+    //setting the pseudonyms that are to be used for the QR code
+    public void setPseudonyms(List<String> pseudonyms){
+        this.pseudonyms=pseudonyms;
+    }
+
+    public void generateCurrentQR(int day){
+
+        int random=(int)Math.random()*1000;
+
+        try {
+            //hashing the pseudonym with the random number
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+
+            KeySpec spec = new PBEKeySpec(Integer.toString(random).toCharArray());
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+
+            byte[] iv = cipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
+            String encodedLine = Base64.getEncoder().encodeToString(cipher.doFinal(pseudonyms.get(day).getBytes()));
+
+            //making the code
+            qrcode = new QRcode(random,bussinesName,encodedLine);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

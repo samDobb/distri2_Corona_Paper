@@ -1,16 +1,17 @@
-
+import javax.crypto.SecretKey;
 
 public class OwnerFacility {
-
     private String name;
-    private String clientServiceName;
-    private String clientAdress;
+    private String location;
 
-    //constructor
-    public OwnerFacility(String name, String clientAdress,String clientServiceName){
-        this.name = name;
-        this.clientServiceName = clientServiceName;
-        this.clientAdress=clientAdress;
+    private String clientServiceName;
+    private String clientAddres;
+
+    OwnerFacility(String name,String location,String clientServiceName,String clientAddres){
+        this.name=name;
+        this.location=location;
+        this.clientAddres=clientAddres;
+        this.clientServiceName=clientServiceName;
     }
 
     public String getName() {
@@ -21,6 +22,14 @@ public class OwnerFacility {
         this.name = name;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public String getClientServiceName() {
         return clientServiceName;
     }
@@ -29,11 +38,11 @@ public class OwnerFacility {
         this.clientServiceName = clientServiceName;
     }
 
-    public String getClientAdress() {
-        return clientAdress;
+    public String getClientAddres() {
+        return clientAddres;
     }
 
-    public void setClientAdress(String clientAdress) {
-        this.clientAdress = clientAdress;
+    public void setClientAddres(String clientAddres) {
+        this.clientAddres = clientAddres;
     }
 }
