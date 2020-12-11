@@ -42,7 +42,7 @@ public class runFacility {
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             String out = new String(cipher.doFinal(Base64.getDecoder().decode(encodedLine)));
 
-            System.out.println(Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH));
+            System.out.println(java.util.Calendar.getInstance().getTime().toString());
 
 
         } catch (InvalidKeySpecException e) {

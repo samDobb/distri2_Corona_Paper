@@ -166,12 +166,13 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar{
         List<String> actTokens=new ArrayList<>();
         RandomToken token=new RandomToken();
 
-        String date=java.util.Calendar.getInstance().getTime().toString());
+        String date=java.util.Calendar.getInstance().getTime().toString();
 
         //generates the 48 tokens
         //also checks if the token is already used
         for(int i=0;i<48;i++){
-            String newToken = date+token.nextString();
+            String newToken = date+"."+token.nextString();
+
             if(!allActiveTokens.contains(newToken)){
                 allActiveTokens.add(newToken);
                 actTokens.add(newToken);

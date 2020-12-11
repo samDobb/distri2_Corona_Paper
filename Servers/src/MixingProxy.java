@@ -1,2 +1,2 @@
-public class MixingProxy {
+public interface MixingProxy {
 }
