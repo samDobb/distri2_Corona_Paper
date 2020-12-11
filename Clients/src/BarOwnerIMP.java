@@ -115,6 +115,7 @@ public class BarOwnerIMP extends UnicastRemoteObject implements BarOwner {
     }
 
     //setting the pseudonyms that are to be used for the QR code
+    @Override
     public void setPseudonyms(List<String> pseudonyms){
         this.pseudonyms=pseudonyms;
     }
