@@ -23,9 +23,6 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
     //constructor
     MatchingServiceIMP() throws RemoteException {
-        super();
-
-        entries=new ArrayList<>();
 
         try{
             //creating rmi registry
@@ -103,11 +100,11 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
         String[] split = log.getEntryTime().toString().split(" ");
         int day=Integer.parseInt(split[2]);
 
-        List<String> pseudonyms= registrar.sendPseudonyms(day);
+        List<byte[]> pseudonyms= registrar.sendPseudonyms(day);
 
         String logPseu=" ";
 
-        for(String pseu:pseudonyms){
+        for(byte[] pseu:pseudonyms){
             if(pseu.equals(logPseu))return true;
         }
 

@@ -3,12 +3,12 @@ import java.util.Date;
 public class Capsule {
     private Date startTime;
     private Date endTime;
-    private String encodedLine;
+    private byte[] encodedLine;
     private String token;
 
     private boolean informed;
 
-    Capsule(Date startTime, Date endTime, String line, String token){
+    Capsule(Date startTime, Date endTime, byte[] line, String token){
         this.startTime=startTime;
         this.endTime=endTime;
         this.encodedLine=line;
@@ -33,11 +33,11 @@ public class Capsule {
         this.endTime = endTime;
     }
 
-    public String getEncodedLine() {
+    public byte[] getEncodedLine() {
         return encodedLine;
     }
 
-    public void setEncodedLine(String encodedLine) {
+    public void setEncodedLine(byte[] encodedLine) {
         this.encodedLine = encodedLine;
     }
 

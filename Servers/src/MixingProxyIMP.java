@@ -50,7 +50,7 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
     }
 
     @Override
-   public byte[] sendCapsule(Date startTime, Date endTime, String token, byte[] signature, String encodedLine, PublicKey publicKey){
+   public byte[] sendCapsule(Date startTime, Date endTime, String token, byte[] signature, byte[] encodedLine, PublicKey publicKey){
         try {
             //Creating a Signature object
             Signature sign = Signature.getInstance("SHA256withDSA");

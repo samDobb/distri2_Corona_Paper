@@ -67,59 +67,8 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
     public void enrollFacility(String[] details) {
         OwnerFacility owner = new OwnerFacility(details[0], details[1], details[2], details[3]);
         facilities.add(owner);
-        generatePseudonyms(owner);
     }
 
-    //generate the nessecary pseudonyms for a facility for the coming month (used at the start of the first day)
-    public void generatePseudonyms(OwnerFacility owner) {
-
-        byte[] date = java.util.Calendar.getInstance().getTime().toString().getBytes();
-
-        String name = owner.getName();
-        String location = owner.getLocation();
-        try {
-            KeySpec spec = new PBEKeySpec(name.toCharArray(), date, 1000);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-
-            byte[] iv = cipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
-            String encodedLine = Base64.getEncoder().encodeToString(cipher.doFinal(masterSecretKey.getEncoded()));
-
-            int monthMaxDays = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
-
-            List<String> pseudonyms = new ArrayList<>(monthMaxDays);
-
-            Calendar c = java.util.Calendar.getInstance();
-
-            //making a pseudonym for every day for the current month
-            for (int i = 0; i < monthMaxDays; i++) {
-                c.add(Calendar.DATE, 1);
-
-                byte[] datePseu = c.getTime().toString().getBytes();
-
-                KeySpec keyspec = new PBEKeySpec(location.toCharArray(), datePseu, 1000);
-                tmp = factory.generateSecret(keyspec);
-                SecretKey secretPseu = new SecretKeySpec(tmp.getEncoded(), "AES");
-
-                Cipher cipherPseu = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                cipherPseu.init(Cipher.ENCRYPT_MODE, secretPseu);
-
-                String encodedLinePseu = Base64.getEncoder().encodeToString(cipherPseu.doFinal(Base64.getDecoder().decode(encodedLine)));
-
-                pseudonyms.add(encodedLinePseu);
-            }
-
-            //sending the list of pseudonyms to the facility
-            BarOwner fac = (BarOwner) Naming.lookup("rmi://" + owner.getClientAddres() + "/" + owner.getClientServiceName());
-            fac.setPseudonyms(pseudonyms);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     //removing a facility
     @Override
@@ -133,12 +82,60 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
         }
     }
 
+
+    //generate the 48 pseudonyms for the facility
+    @Override
+    public List<byte[]> getPseudonyms(String name,String location){
+
+        int monthMaxDays = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        List<byte[]> pseudonyms = new ArrayList<>(monthMaxDays);
+
+        byte[] date = java.util.Calendar.getInstance().getTime().toString().getBytes();
+
+        try {
+            KeySpec spec = new PBEKeySpec(name.toCharArray(), date, 1000);
+            SecretKey tmp = factory.generateSecret(spec);
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+
+            String encodedLine = Base64.getEncoder().encodeToString(cipher.doFinal(masterSecretKey.getEncoded()));
+
+            Calendar c = java.util.Calendar.getInstance();
+
+            //making a pseudonym for every day of the current month
+            for (int i = 0; i < monthMaxDays; i++) {
+                c.add(Calendar.DATE, 1);
+
+                String[] tmpDate = c.getTime().toString().split(" ");
+
+                String day=tmpDate[2];
+                String month=tmpDate[1];
+                String year=tmpDate[5];
+
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+                String line = new String(encodedLine) + location + day + month + year;
+
+                byte[] encodedLinePseu = md.digest(line.getBytes());
+
+                pseudonyms.add(encodedLinePseu);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return pseudonyms;
+    }
+
     //adding a visitor
     @Override
     public void enrollNewUser(String[] details) {
         System.out.println("New client added: "+details[0]+" tel: "+ details[1]);
         Client client = new Client(details[0], details[1], details[2], details[3]);
-        this.generateUserToken(client);
         clients.add(client);
     }
 
@@ -160,8 +157,9 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
         return true;
     }
 
+    @Override
     //generating the new 48 users token for the given client
-    public void generateUserToken(Client c) {
+    public GetTokenMessage generateUserToken(String tel) {
 
         List<String> actTokens = new ArrayList<>();
         List<byte[]> signatures = new ArrayList<>();
@@ -169,6 +167,11 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
         RandomToken randomGen = new RandomToken();
 
         String date = java.util.Calendar.getInstance().getTime().toString();
+        Client client=null;
+        GetTokenMessage tokenMessage=null;
+        for(Client c:clients){
+            if(c.getTelephoneNumber().equals(tel))client=c;
+        }
 
 //preparing for the signature
         try {
@@ -203,24 +206,23 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
                 }
             }
 
-            c.shiftActiveTokens();
-            c.setActiveTokens(actTokens);
-            c.setSignatures(signatures);
+            client.shiftActiveTokens();
+            client.setActiveTokens(actTokens);
+            client.setSignatures(signatures);
 
-            //sending the list of pseudonyms to the facility
-            Visitor client = (Visitor) Naming.lookup("rmi://" + c.getClientAddres() + "/" + c.getClientServiceName());
-            client.setTokens(actTokens, signatures, pair.getPublic() );
+            tokenMessage=new GetTokenMessage(actTokens,signatures, pair.getPublic());
+
             mixingProxy.addPublicKey(pair.getPublic());
 
         }catch (Exception e) {
             e.printStackTrace();
         }
-
+        return tokenMessage;
     }
 
     //getting the pseudonyms from all the facilities from a specific day
-    public List<String> sendPseudonyms(int day){
-        List<String> allPseudonyms=new ArrayList<>();
+    public List<byte[]> sendPseudonyms(int day){
+        List<byte[]> allPseudonyms=new ArrayList<>();
 
         for(OwnerFacility fac:facilities){
             allPseudonyms.add(fac.getPseu(day));

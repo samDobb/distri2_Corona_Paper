@@ -1,4 +1,3 @@
-import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +8,7 @@ public class OwnerFacility {
     private String clientServiceName;
     private String clientAddres;
 
-    private List<String> pseudonyms;
+    private List<byte[]> pseudonyms;
 
     OwnerFacility(String name,String location,String clientServiceName,String clientAddres){
         this.name=name;
@@ -52,15 +51,15 @@ public class OwnerFacility {
         this.clientAddres = clientAddres;
     }
 
-    public List<String> getPseudonyms() {
+    public List<byte[]> getPseudonyms() {
         return pseudonyms;
     }
 
-    public void setPseudonyms(List<String> pseudonyms) {
+    public void setPseudonyms(List<byte[]> pseudonyms) {
         this.pseudonyms = pseudonyms;
     }
 
-    public String getPseu(int day){
+    public byte[] getPseu(int day){
         return pseudonyms.get(day);
     }
 }
