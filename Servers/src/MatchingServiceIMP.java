@@ -13,7 +13,10 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
     private List<Capsule> entries;
 
+    private List<Capsule> criticalEntries;
+
     private int entryTime=14;
+
     //constructor
     MatchingServiceIMP() throws RemoteException {
         super();
@@ -64,4 +67,28 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
     }
 
+    //getting the logs from the practitionar and searching for the critical entry
+    public void getCriticalLogs(List<ClientLog> logs){
+        for(ClientLog log:logs){
+            for(Capsule entry:entries){
+                //if the facility is the same then go
+                if(log.getEncodedLine().equals(entry.getEncodedLine())){
+
+                    //if the start time from the entry is between the times of the log then go
+                    if(entry.getStartTime().after(log.getEntryTime()) && entry.getStartTime().before(log.getStopTime())){
+
+                        //if the token is the same then the user is already informed
+                        if(log.getToken().equals(entry.getToken())){
+                            entry.setInformed(true);
+                        }
+                        criticalEntries.add(entry);
+                    }
+                }
+            }
+        }
+    }
+
+    public  List<Capsule> sendCriticalLogs(){
+        return criticalEntries;
+    }
 }

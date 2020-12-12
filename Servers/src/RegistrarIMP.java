@@ -109,7 +109,6 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
                 Cipher cipherPseu = Cipher.getInstance("AES/CBC/PKCS5Padding");
                 cipherPseu.init(Cipher.ENCRYPT_MODE, secretPseu);
 
-
                 String encodedLinePseu = Base64.getEncoder().encodeToString(cipherPseu.doFinal(Base64.getDecoder().decode(encodedLine)));
 
                 pseudonyms.add(encodedLinePseu);

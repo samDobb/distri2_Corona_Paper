@@ -110,4 +110,7 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
         publicKeys.add(key);
     }
 
+    public List<Capsule> sendCriticalLogs() throws RemoteException {
+        return matchingService.sendCriticalLogs();
+    }
 }

@@ -91,14 +91,14 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
     }
 
     //add a log
-    public void addLog(int random,String name,String line){
+    public void addLog(int random,String name,String line,String token){
         Date firstDate=java.util.Calendar.getInstance().getTime();
 
         Calendar c = java.util.Calendar.getInstance();
         c.add(Calendar.MINUTE,30);
         Date secondDate= c.getTime();
 
-        logs.add(new ClientLog(random,name,line,firstDate,secondDate));
+        logs.add(new ClientLog(random,name,line,token,firstDate,secondDate));
     }
 
     //remove all the logs where the time is longer than 2 weeks ago
@@ -111,7 +111,7 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
         //searching for all the logs that need to be removed
         for(ClientLog log:logs) {
 
-            long diffInMillies = Math.abs(currentDate.getTime() - log.getEntrytime().getTime());
+            long diffInMillies = Math.abs(currentDate.getTime() - log.getEntryTime().getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
             if(diff > entryTime){
@@ -131,6 +131,10 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
             pastTokens.add(token);
         }
         activeTokens.clear();
+    }
+
+    public void getCriticalEntries() throws RemoteException {
+        List<Capsule> criticalEntries=mixingProxy.sendCriticalLogs();
     }
 
 }

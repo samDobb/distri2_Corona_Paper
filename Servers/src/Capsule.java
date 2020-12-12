@@ -6,11 +6,15 @@ public class Capsule {
     private String encodedLine;
     private String token;
 
+    private boolean informed;
+
     Capsule(Date startTime, Date endTime, String line, String token){
         this.startTime=startTime;
         this.endTime=endTime;
         this.encodedLine=line;
         this.token=token;
+
+        this.informed=false;
     }
 
     public Date getStartTime() {
@@ -43,5 +47,13 @@ public class Capsule {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public boolean isInformed() {
+        return informed;
+    }
+
+    public void setInformed(boolean informed) {
+        this.informed = informed;
     }
 }

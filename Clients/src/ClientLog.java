@@ -3,13 +3,15 @@ import java.util.Date;
 public class ClientLog {
     private int random;
     private String facilityName;
+    private String token;
     private String encodedLine;
     private Date entryTime;
     private Date stopTime;
 
-    public ClientLog(int random,String  name,String line, Date entryTime,Date stopTime){
+    public ClientLog(int random,String name,String token,String line, Date entryTime,Date stopTime){
         this.random=random;
         this.facilityName=name;
+        this.token=token;
         this.encodedLine=line;
         this.entryTime=entryTime;
         this.stopTime=stopTime;
@@ -39,11 +41,27 @@ public class ClientLog {
         this.encodedLine = encodedLine;
     }
 
-    public Date getEntrytime() {
+    public Date getEntryTime() {
         return entryTime;
     }
 
-    public void setEntrytime(Date entrytime) {
-        this.entryTime = entrytime;
+    public void setEntryTime(Date entryTime) {
+        this.entryTime = entryTime;
+    }
+
+    public Date getStopTime() {
+        return stopTime;
+    }
+
+    public void setStopTime(Date stopTime) {
+        this.stopTime = stopTime;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
