@@ -102,8 +102,14 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
         else return false;
     }
 
+    //adding a public key
     public void addPublicKey(PublicKey key){
         publicKeys.add(key);
+    }
+
+    //removing a public key
+    public void removePublicKey(PublicKey key){
+       if(key!=null)publicKeys.remove(key);
     }
 
     //returning the critical logs

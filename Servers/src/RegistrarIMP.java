@@ -159,7 +159,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
     @Override
     //generating the new 48 users token for the given client
-    public GetTokenMessage generateUserToken(String tel) {
+    public GetTokenMessage generateUserToken(String username,PublicKey key) {
 
         List<String> actTokens = new ArrayList<>();
         List<byte[]> signatures = new ArrayList<>();
@@ -170,10 +170,10 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
         Client client=null;
         GetTokenMessage tokenMessage=null;
         for(Client c:clients){
-            if(c.getTelephoneNumber().equals(tel))client=c;
+            if(c.getUsername().equals(username))client=c;
         }
 
-//preparing for the signature
+    //preparing for the signature
         try {
             //Creating KeyPair generator object
             KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("DSA");

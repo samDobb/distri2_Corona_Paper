@@ -1,5 +1,6 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.security.PublicKey;
 import java.util.List;
 
 public interface Registrar extends Remote {
@@ -14,7 +15,7 @@ public interface Registrar extends Remote {
      void enrollNewUser(String[] details) throws RemoteException;
      boolean checkUserName(String username) throws RemoteException;
      boolean checkUserTel(String telephoneNumber) throws RemoteException;
-     GetTokenMessage generateUserToken(String tel) throws RemoteException;
+     GetTokenMessage generateUserToken(String username, PublicKey key) throws RemoteException;
 
      //methods for matching service
     List<PseuLocMessage> sendPseudonyms(int day) throws RemoteException;
