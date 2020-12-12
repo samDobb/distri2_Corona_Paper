@@ -4,13 +4,15 @@ public class ClientLog {
     private int random;
     private String facilityName;
     private String encodedLine;
-    private Date entrytime;
+    private Date entryTime;
+    private Date stopTime;
 
-    public ClientLog(int random,String  name,String line, Date time){
+    public ClientLog(int random,String  name,String line, Date entryTime,Date stopTime){
         this.random=random;
         this.facilityName=name;
         this.encodedLine=line;
-        this.entrytime=time;
+        this.entryTime=entryTime;
+        this.stopTime=stopTime;
     }
 
     public int getRandom() {
@@ -38,10 +40,10 @@ public class ClientLog {
     }
 
     public Date getEntrytime() {
-        return entrytime;
+        return entryTime;
     }
 
     public void setEntrytime(Date entrytime) {
-        this.entrytime = entrytime;
+        this.entryTime = entrytime;
     }
 }

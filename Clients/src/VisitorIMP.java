@@ -33,7 +33,8 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
 
     private List<ClientLog> logs;
 
-    private int entryTime=14;
+    private int tokenTime=30; //in minutes
+    private int entryTime=14; //in days
 
     public VisitorIMP(String username, String telephoneNumber) throws RemoteException {
         super();
@@ -91,7 +92,13 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
 
     //add a log
     public void addLog(int random,String name,String line){
-        logs.add(new ClientLog(random,name,line,java.util.Calendar.getInstance().getTime()));
+        Date firstDate=java.util.Calendar.getInstance().getTime();
+
+        Calendar c = java.util.Calendar.getInstance();
+        c.add(Calendar.MINUTE,30);
+        Date secondDate= c.getTime();
+
+        logs.add(new ClientLog(random,name,line,firstDate,secondDate));
     }
 
     //remove all the logs where the time is longer than 2 weeks ago
