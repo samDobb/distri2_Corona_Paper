@@ -15,10 +15,13 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
 
     private MatchingService matchingService;
 
+    private List<PublicKey> publicKeys;
+
     public MixingProxyIMP() throws RemoteException {
         super();
 
         capsules=new ArrayList<>();
+        publicKeys = new ArrayList<>();
 
         try{
 
@@ -58,12 +61,11 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
             sign.initVerify(publicKey);
             sign.update(token.getBytes());
 
-            //verifing the token is valid
-            if(sign.verify(signature)) {
+            //verifing if the token is valid
+            if(publicKeys.contains(publicKey) && sign.verify(signature)) {
 
                 //verifing if the token is from the current day
                 if (checkToken(token)) {
-
 
                     capsules.add(new Capsule(startTime,endTime, encodedLine, token));
 
@@ -103,4 +105,9 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
         }
         else return false;
     }
+
+    public void addPublicKey(PublicKey key){
+        publicKeys.add(key);
+    }
+
 }

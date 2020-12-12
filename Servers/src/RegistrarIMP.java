@@ -20,6 +20,8 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
     private SecretKey masterSecretKey;
     private SecretKeyFactory factory;
 
+    private MixingProxy mixingProxy;
+
     //constructor
     RegistrarIMP() throws RemoteException {
         super();
@@ -40,6 +42,9 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
             masterSecretKey = keygen.generateKey();
+
+            mixingProxy =(MixingProxy) Naming.lookup("rmi://localhost/MixingProxy");
+
         } catch (Exception e) {
             System.out.println("Server had problems starting");
         }
@@ -162,7 +167,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
         List<String> actTokens = new ArrayList<>();
         List<byte[]> signatures = new ArrayList<>();
 
-        RandomToken token = new RandomToken();
+        RandomToken randomGen = new RandomToken();
 
         String date = java.util.Calendar.getInstance().getTime().toString();
 
@@ -187,11 +192,14 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             //also checks if the token is already used
             for (int i = 0; i < 48; i++) {
 
-                String newToken = date + " " + token.nextString();
+                String newToken = date + " " + randomGen.nextString();
+
+                //checking if token is the a duplicate
                 if (!actTokens.contains(newToken)) {
 
                     sign.update(newToken.getBytes());
                     signatures.add(sign.sign());
+
                     actTokens.add(newToken);
                 }
             }
@@ -203,6 +211,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             //sending the list of pseudonyms to the facility
             Visitor client = (Visitor) Naming.lookup("rmi://" + c.getClientAddres() + "/" + c.getClientServiceName());
             client.setTokens(actTokens, signatures, pair.getPublic() );
+            mixingProxy.addPublicKey(pair.getPublic());
 
         }catch (Exception e) {
             e.printStackTrace();
