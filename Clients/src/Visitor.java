@@ -28,11 +28,12 @@ public class Visitor {
 
     private MixingProxy mixingProxy;
 
-
     private List<ClientLog> logs;
 
-    private int tokenTime=30; //in minutes
-    private int entryTime=14; //in days
+    private boolean infected=false;
+
+    private int tokenTime = 30; //in minutes
+    private int entryTime = 14; //in days
 
     public Visitor(String username, String telephoneNumber) throws RemoteException {
         super();
@@ -40,62 +41,77 @@ public class Visitor {
         this.username = username;
         this.telephoneNumber = telephoneNumber;
 
-        qRcodes=new ArrayList<>();
-        qRtimes=new ArrayList<>();
+        qRcodes = new ArrayList<>();
+        qRtimes = new ArrayList<>();
         signatures = new ArrayList<>();
     }
 
-    public void readQr(QRcode qr){
+    public void readQr(QRcode qr) {
         qRcodes.add(qr);
         qRtimes.add(java.util.Calendar.getInstance());
     }
 
     //add a log
-    public void addLog(int random,String name,byte[] line,byte[] token){
-        Date firstDate=java.util.Calendar.getInstance().getTime();
+    public void addLog(int random, String name, String line, byte[] token) {
+        Date firstDate = java.util.Calendar.getInstance().getTime();
 
         Calendar c = java.util.Calendar.getInstance();
-        c.add(Calendar.MINUTE,30);
-        Date secondDate= c.getTime();
+        c.add(Calendar.MINUTE, 30);
+        Date secondDate = c.getTime();
 
-        logs.add(new ClientLog(random,name,line,token,firstDate,secondDate));
+        logs.add(new ClientLog(random, name, line, token, firstDate, secondDate));
     }
 
     //remove all the logs where the time is longer than 2 weeks ago
-    public void checkLogs() throws ParseException {
+    public void removeLogs() throws ParseException {
 
         Date currentDate = java.util.Calendar.getInstance().getTime();
 
-        List<ClientLog> removedLogs=new ArrayList<>();
+        List<ClientLog> removedLogs = new ArrayList<>();
 
         //searching for all the logs that need to be removed
-        for(ClientLog log:logs) {
+        for (ClientLog log : logs) {
 
             long diffInMillies = Math.abs(currentDate.getTime() - log.getEntryTime().getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
-            if(diff > entryTime){
+            if (diff > entryTime) {
                 removedLogs.add(log);
             }
         }
 
         //removing the marked logs
-        for(ClientLog log:removedLogs){
+        for (ClientLog log : removedLogs) {
             logs.remove(log);
         }
 
     }
 
-    public void shiftActiveTokens(){
-        for(String token:activeTokens){
+    public void shiftActiveTokens() {
+        for (String token : activeTokens) {
             pastTokens.add(token);
         }
         activeTokens.clear();
     }
 
     public void getCriticalEntries() throws RemoteException {
-        List<Capsule> criticalEntries=mixingProxy.sendCriticalLogs();
+        List<CriticalEntry> criticalEntries = mixingProxy.sendCriticalLogs();
+        List<String> infectedTokens = new ArrayList<>();
+
+        for (CriticalEntry entry : criticalEntries) {
+            for (ClientLog log : logs) {
+                if (entry.getEncodedLine().equals(log.getEncodedLine())) {
+                    if(entry.getStartTime().before(log.getStopTime()) && entry.getStartTime().after(log.getEntryTime())){
+                        infectedTokens.add(log.getToken());
+                        infected=true;
+                    }
+                }
+            }
+        }
+
+        mixingProxy.getInfectedTokens(infectedTokens);
     }
+
 
     @Override
     public String toString() {

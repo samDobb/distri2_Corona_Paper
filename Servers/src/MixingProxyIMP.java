@@ -106,7 +106,18 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
         publicKeys.add(key);
     }
 
-    public List<Capsule> sendCriticalLogs() throws RemoteException {
+    public List<CriticalEntry> sendCriticalLogs() throws RemoteException {
         return matchingService.sendCriticalLogs();
+    }
+
+    public void getInfectedTokens(List<String> infectedTokens) throws RemoteException {
+        for(Capsule capsule:capsules) {
+            for(String token:infectedTokens)
+            if(capsule.getToken().equals(token)){
+                capsule.setInformed(true);
+            }
+        }
+
+        matchingService.getInfectedTokens(infectedTokens);
     }
 }

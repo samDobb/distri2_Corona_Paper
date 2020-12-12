@@ -17,7 +17,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
     private List<Capsule> entries;
 
-    private List<Capsule> criticalEntries;
+    private List<CriticalEntry> criticalEntries;
 
     private Registrar registrar;
 
@@ -29,7 +29,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
         try{
             //creating rmi registry
             java.rmi.registry.LocateRegistry.createRegistry(1099);
-            System.out.println("MatchingService Server ready");
+            System.out.println("RMI registry ready");
 
             //setting the registrar in the registry so the clients can find it
             Naming.rebind("rmi://localhost/MatchingService", this);
@@ -71,7 +71,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
     }
 
-    //getting the logs from the practitionar and searching for the critical entry
+    //getting the logs from the practitioner and searching for the critical entry
     public void getCriticalLogs(List<ClientLog> logs) throws RemoteException {
         try {
             for (ClientLog log : logs) {
@@ -85,11 +85,14 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                             //if the start time from the entry is between the times of the log then go
                             if (entry.getStartTime().after(log.getEntryTime()) && entry.getStartTime().before(log.getStopTime())) {
 
-                                //if the token is the same then the user is already informed
-                                if (log.getToken().equals(entry.getToken())) {
-                                    entry.setInformed(true);
+                                //if the user is already informed
+                                if(entry.getInformed()) {
+                                    //if the token is the same then the user is already informed
+                                    if (log.getToken().equals(entry.getToken())) {
+                                        entry.setInformed(true);
+                                    }
+                                    criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getEncodedLine()));
                                 }
-                                criticalEntries.add(entry);
                             }
                         }
                     }
@@ -128,13 +131,25 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     }
 
     //RMI: sends the critical logs
-    public  List<Capsule> sendCriticalLogs(){
+    @Override
+    public  List<CriticalEntry> sendCriticalLogs(){
         return criticalEntries;
     }
 
     public void connectRegister() throws RemoteException, NotBoundException, MalformedURLException {
 
         registrar =(Registrar) Naming.lookup("rmi://localhost/Registrar");
+    }
+
+    // setting the given tokens on informed
+    @Override
+    public void getInfectedTokens(List<String> infectedTokens){
+        for(Capsule capsule:entries) {
+            for(String token:infectedTokens)
+                if(capsule.getToken().equals(token)){
+                    capsule.setInformed(true);
+                }
+        }
     }
 
 }

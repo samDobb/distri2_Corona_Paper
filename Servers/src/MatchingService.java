@@ -8,5 +8,7 @@ public interface MatchingService extends Remote {
 
     void getCriticalLogs(List<ClientLog> logs) throws RemoteException;
 
-    List<Capsule> sendCriticalLogs() throws RemoteException;
+    List<CriticalEntry> sendCriticalLogs() throws RemoteException;
+
+    void getInfectedTokens(List<String> infectedTokens) throws RemoteException;
 }

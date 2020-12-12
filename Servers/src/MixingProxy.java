@@ -9,5 +9,6 @@ public interface MixingProxy extends Remote {
     void addPublicKey(PublicKey key) throws RemoteException;
     byte[] sendCapsule(Date startTime, Date endTime, String token, byte[] signature, byte[] encodedLine, PublicKey publicKey) throws RemoteException;
 
-    List<Capsule> sendCriticalLogs() throws RemoteException;
+    List<CriticalEntry> sendCriticalLogs() throws RemoteException;
+    void getInfectedTokens(List<String> infectedTokens) throws RemoteException;
 }
