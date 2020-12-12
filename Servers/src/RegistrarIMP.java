@@ -221,11 +221,12 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
     }
 
     //getting the pseudonyms from all the facilities from a specific day
-    public List<byte[]> sendPseudonyms(int day){
-        List<byte[]> allPseudonyms=new ArrayList<>();
+    public List<PseuLocMessage> sendPseudonyms(int day){
+        List<PseuLocMessage> allPseudonyms=new ArrayList<>();
 
         for(OwnerFacility fac:facilities){
-            allPseudonyms.add(fac.getPseu(day));
+            PseuLocMessage mes=new PseuLocMessage(fac.getPseu(day),fac.getLocation());
+            allPseudonyms.add(mes);
         }
 
         return allPseudonyms;

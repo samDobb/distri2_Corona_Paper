@@ -5,6 +5,8 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,41 +73,55 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
     //getting the logs from the practitionar and searching for the critical entry
     public void getCriticalLogs(List<ClientLog> logs) throws RemoteException {
-        for(ClientLog log:logs){
+        try {
+            for (ClientLog log : logs) {
+                //validating the log
+                if (validateLog(log)) {
+                    for (Capsule entry : entries) {
 
-            //validating the log
-            if(validateLog(log)) {
-                for (Capsule entry : entries) {
+                        //if the facility is the same then go
+                        if (log.getEncodedLine().equals(entry.getEncodedLine())) {
 
-                    //if the facility is the same then go
-                    if (log.getEncodedLine().equals(entry.getEncodedLine())) {
+                            //if the start time from the entry is between the times of the log then go
+                            if (entry.getStartTime().after(log.getEntryTime()) && entry.getStartTime().before(log.getStopTime())) {
 
-                        //if the start time from the entry is between the times of the log then go
-                        if (entry.getStartTime().after(log.getEntryTime()) && entry.getStartTime().before(log.getStopTime())) {
-
-                            //if the token is the same then the user is already informed
-                            if (log.getToken().equals(entry.getToken())) {
-                                entry.setInformed(true);
+                                //if the token is the same then the user is already informed
+                                if (log.getToken().equals(entry.getToken())) {
+                                    entry.setInformed(true);
+                                }
+                                criticalEntries.add(entry);
                             }
-                            criticalEntries.add(entry);
                         }
                     }
                 }
             }
+        }catch (Exception e){
+            System.out.println("The checking of the Patient logs have been stopped\n");
+            e.printStackTrace();
         }
     }
 
     //checks if the log is valid
-    public boolean validateLog(ClientLog log) throws RemoteException {
+    public boolean validateLog(ClientLog log) throws RemoteException, NoSuchAlgorithmException {
         String[] split = log.getEntryTime().toString().split(" ");
         int day=Integer.parseInt(split[2]);
 
-        List<byte[]> pseudonyms= registrar.sendPseudonyms(day);
+        List<PseuLocMessage> pseudonyms= registrar.sendPseudonyms(day);
 
-        String logPseu=" ";
 
-        for(byte[] pseu:pseudonyms){
-            if(pseu.equals(logPseu))return true;
+        byte[] logEncodedLine=log.getEncodedLine();
+        int random = log.getRandom();
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+        //checking for every pseudonym if the newly made pseudonym
+        for(PseuLocMessage pseu:pseudonyms){
+
+            String line = new String(logEncodedLine)+random+pseu.getLocation();
+            byte[] encodedLine = md.digest(line.getBytes());
+
+            if(pseu.getPseudonym().equals(encodedLine))return true;
+
         }
 
         return false;

@@ -24,9 +24,6 @@ public class BarOwner{
     private String bussinesName;
     private String bussinesAddres;
 
-    private String clientServiceName;
-    private String clientAddres;
-
     private Registrar registrar;
 
     private List<byte[]> pseudonyms;
@@ -94,7 +91,7 @@ public class BarOwner{
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-            String line = new String(pseudonyms.get(day)) + random;
+            String line = new String(pseudonyms.get(day)) + random + bussinesAddres;
 
             byte[] encodedLine = md.digest(line.getBytes());
 

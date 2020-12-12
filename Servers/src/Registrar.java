@@ -17,5 +17,5 @@ public interface Registrar extends Remote {
      GetTokenMessage generateUserToken(String tel) throws RemoteException;
 
      //methods for matching service
-    List<byte[]> sendPseudonyms(int day) throws RemoteException;
+    List<PseuLocMessage> sendPseudonyms(int day) throws RemoteException;
 }

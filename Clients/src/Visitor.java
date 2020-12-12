@@ -14,15 +14,13 @@ public class Visitor {
     private String username;
     private String telephoneNumber;
 
-    private String clientServiceName;
-    private String clientAddres;
-
     private Registrar registrar;
 
     private List<String> pastTokens;
     private List<String> activeTokens;
 
     private List<byte[]> signatures;
+
     private PublicKey publicKey;
 
     private List<QRcode> qRcodes;
