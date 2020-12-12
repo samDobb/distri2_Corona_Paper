@@ -58,7 +58,7 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
             mixingProxy = (MixingProxy) Naming.lookup("rmi://localhost/MixingProxy");
 
             //checking if name is not taken
-            if (!registrar.checkUserName(username) && !registrar.checkUserTel(telephoneNumber)) {
+            if (registrar.checkUserName(username) && registrar.checkUserTel(telephoneNumber)) {
 
                 //starting rmi for this visitor
                 Naming.rebind("rmi://" + clientAddres + "/" + clientServiceName, this);
@@ -67,7 +67,11 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
                 //registering this visitor to the registrar
                 String[] details = {username, telephoneNumber, clientAddres, clientServiceName};
                 registrar.enrollNewUser(details);
+                return true;
 
+            }
+            else{
+                System.out.println("Problem with username or tel");
             }
         } catch (Exception e) {
 
@@ -137,4 +141,11 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
         List<Capsule> criticalEntries=mixingProxy.sendCriticalLogs();
     }
 
+    @Override
+    public String toString() {
+        return "VisitorIMP{" +
+                "username='" + username + '\'' +
+                ", telephoneNumber='" + telephoneNumber + '\'' +
+                '}';
+    }
 }

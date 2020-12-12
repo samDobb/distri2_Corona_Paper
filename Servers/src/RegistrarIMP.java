@@ -29,9 +29,6 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
         clients = new ArrayList<>();
 
         try {
-            //creating rmi registry
-            java.rmi.registry.LocateRegistry.createRegistry(1099);
-            System.out.println("Registrar Server ready");
 
             //setting the registrar in the registry so the clients can find it
             Naming.rebind("rmi://localhost/Registrar", this);
@@ -46,6 +43,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             mixingProxy =(MixingProxy) Naming.lookup("rmi://localhost/MixingProxy");
 
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Server had problems starting");
         }
     }
@@ -138,7 +136,9 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
     //adding a visitor
     @Override
     public void enrollNewUser(String[] details) {
+        System.out.println("New client added: "+details[0]+" tel: "+ details[1]);
         Client client = new Client(details[0], details[1], details[2], details[3]);
+        this.generateUserToken(client);
         clients.add(client);
     }
 

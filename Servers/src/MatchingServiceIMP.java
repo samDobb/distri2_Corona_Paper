@@ -29,7 +29,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
         try{
             //creating rmi registry
-            java.rmi.registry.LocateRegistry.createRegistry(1100);
+            java.rmi.registry.LocateRegistry.createRegistry(1099);
             System.out.println("MatchingService Server ready");
 
             //setting the registrar in the registry so the clients can find it
@@ -39,6 +39,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
         }
         catch(Exception e){
             System.out.println("MatchingService Server had problems starting");
+            e.printStackTrace();
         }
     }
 

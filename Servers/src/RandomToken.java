@@ -25,7 +25,7 @@ public class RandomToken {
 
     public String nextString() {
         for (int i = 0; i < buf.length; ++i)
-            buf[i] = symbols[(int) Math.random() *(symbols.length)];
+            buf[i] = symbols[(int) (Math.random() *(symbols.length))];
         return new String(buf);
     }
 

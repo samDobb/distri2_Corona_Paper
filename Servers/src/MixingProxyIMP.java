@@ -25,10 +25,6 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
 
         try{
 
-            //creating rmi registry
-            java.rmi.registry.LocateRegistry.createRegistry(1101);
-            System.out.println("MixingProxy Server ready");
-
             //setting the registrar in the registry so the clients can find it
             Naming.rebind("rmi://localhost/MixingProxy", this);
             System.out.println("MixingProxy Server is running");

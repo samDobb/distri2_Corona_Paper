@@ -39,10 +39,13 @@ public class ClientGUI implements FocusListener, ActionListener {
         char[] digits = "0123456789".toCharArray();
         char[] buf=new char[10];
         for (int i = 0; i < 10;i++){
-            buf[i] = digits[(int) Math.random() *(digits.length)];
+            int randomInd=(int) (Math.random() *(digits.length));
+            buf[i] = digits[randomInd];
         }
-        String tel=buf.toString();
+        String tel=new String(buf);
+        System.out.println(tel);
         this.v=new VisitorIMP(username,tel);
+        System.out.println(this.v.toString());
         if(v.startClient()){
             System.out.println("Login succes");
             loggedIn=true;
@@ -161,6 +164,8 @@ public class ClientGUI implements FocusListener, ActionListener {
         mainFrame.setContentPane(panel);
         mainFrame.setVisible(true);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        login.addActionListener(this);
+        sendCode.addActionListener(this);
 
 
     }
