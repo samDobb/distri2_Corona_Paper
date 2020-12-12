@@ -13,12 +13,15 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
     private List<Capsule> capsules;
     private PrivateKey privKey;
 
+    private MatchingService matchingService;
+
     public MixingProxyIMP() throws RemoteException {
         super();
 
         capsules=new ArrayList<>();
 
         try{
+
             //creating rmi registry
             java.rmi.registry.LocateRegistry.createRegistry(1101);
             System.out.println("MixingProxy Server ready");
@@ -38,6 +41,8 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
 
             //Getting the privatekey from the key pair
             privKey = pair.getPrivate();
+
+            matchingService = (MatchingService) Naming.lookup("rmi://localhost/MatchingService");
 
         }
         catch(Exception e){

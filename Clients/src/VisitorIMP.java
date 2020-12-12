@@ -28,7 +28,7 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
     private List<QRcode> qRcodes;
     private List<Calendar> qRtimes;
 
-    private MatchingService matchingService;
+    private MixingProxy mixingProxy;
 
 
     private List<ClientLog> logs;
@@ -54,7 +54,7 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
 
         try {
             registrar = (Registrar) Naming.lookup("rmi://localhost/Registrar");
-            matchingService = (MatchingService) Naming.lookup("rmi://localhost/MatchingService");
+            mixingProxy = (MixingProxy) Naming.lookup("rmi://localhost/MixingProxy");
 
             //checking if name is not taken
             if (!registrar.checkUserName(username) && !registrar.checkUserTel(telephoneNumber)) {

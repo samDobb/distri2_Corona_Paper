@@ -21,15 +21,12 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
     private SecretKey masterSecretKey;
     private SecretKeyFactory factory;
 
-    private List<String> allActiveTokens;
-
     //constructor
     RegistrarIMP() throws RemoteException {
         super();
         facilities = new ArrayList<>();
         secretKeys = new ArrayList<>();
         clients = new ArrayList<>();
-        allActiveTokens = new ArrayList<>();
 
         try {
             //creating rmi registry
@@ -116,8 +113,8 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             }
 
             //sending the list of pseudonyms to the facility
-            BarOwner client = (BarOwner) Naming.lookup("rmi://" + owner.getClientAddres() + "/" + owner.getClientServiceName());
-            client.setPseudonyms(pseudonyms);
+            BarOwner fac = (BarOwner) Naming.lookup("rmi://" + owner.getClientAddres() + "/" + owner.getClientServiceName());
+            fac.setPseudonyms(pseudonyms);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -167,7 +164,6 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
         List<String> actTokens = new ArrayList<>();
         List<byte[]> signatures = new ArrayList<>();
 
-
         RandomToken token = new RandomToken();
 
         String date = java.util.Calendar.getInstance().getTime().toString();
@@ -194,15 +190,13 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             for (int i = 0; i < 48; i++) {
 
                 String newToken = date + "." + token.nextString();
-                if (!allActiveTokens.contains(newToken)) {
+                if (!actTokens.contains(newToken)) {
 
                     sign.update(newToken.getBytes());
                     signatures.add(sign.sign());
-                    allActiveTokens.add(newToken);
                     actTokens.add(newToken);
                 }
             }
-
 
             c.shiftActiveTokens();
             c.setActiveTokens(actTokens);
@@ -211,6 +205,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             //sending the list of pseudonyms to the facility
             Visitor client = (Visitor) Naming.lookup("rmi://" + c.getClientAddres() + "/" + c.getClientServiceName());
             client.setTokens(actTokens, signatures, pair.getPublic() );
+
         }catch (Exception e) {
             e.printStackTrace();
         }
