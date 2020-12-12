@@ -60,11 +60,11 @@ public class VisitorIMP extends UnicastRemoteObject implements Visitor {
             //checking if name is not taken
             if (!registrar.checkUserName(username) && !registrar.checkUserTel(telephoneNumber)) {
 
-                //starting rmi for this facility
+                //starting rmi for this visitor
                 Naming.rebind("rmi://" + clientAddres + "/" + clientServiceName, this);
                 System.out.println(username + " is running\n");
 
-                //registering this facility to the registrar
+                //registering this visitor to the registrar
                 String[] details = {username, telephoneNumber, clientAddres, clientServiceName};
                 registrar.enrollNewUser(details);
 
