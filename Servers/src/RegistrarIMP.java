@@ -15,7 +15,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
     private List<OwnerFacility> facilities;
-    private List<SecretKey> secretKeys;
     private List<Client> clients;
 
     private SecretKey masterSecretKey;
@@ -25,7 +24,6 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
     RegistrarIMP() throws RemoteException {
         super();
         facilities = new ArrayList<>();
-        secretKeys = new ArrayList<>();
         clients = new ArrayList<>();
 
         try {
@@ -106,7 +104,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
                 Cipher cipherPseu = Cipher.getInstance("AES/CBC/PKCS5Padding");
                 cipherPseu.init(Cipher.ENCRYPT_MODE, secretPseu);
 
-                byte[] ivPseu = cipherPseu.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
+
                 String encodedLinePseu = Base64.getEncoder().encodeToString(cipherPseu.doFinal(Base64.getDecoder().decode(encodedLine)));
 
                 pseudonyms.add(encodedLinePseu);
@@ -189,7 +187,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             //also checks if the token is already used
             for (int i = 0; i < 48; i++) {
 
-                String newToken = date + "." + token.nextString();
+                String newToken = date + " " + token.nextString();
                 if (!actTokens.contains(newToken)) {
 
                     sign.update(newToken.getBytes());

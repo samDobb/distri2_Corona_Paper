@@ -135,7 +135,6 @@ public class BarOwnerIMP extends UnicastRemoteObject implements BarOwner {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secret);
 
-            byte[] iv = cipher.getParameters().getParameterSpec(IvParameterSpec.class).getIV();
             String encodedLine = Base64.getEncoder().encodeToString(cipher.doFinal(pseudonyms.get(day).getBytes()));
 
             //making the code
