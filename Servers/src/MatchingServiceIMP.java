@@ -1,6 +1,8 @@
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKeyFactory;
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.text.ParseException;
@@ -14,6 +16,8 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     private List<Capsule> entries;
 
     private List<Capsule> criticalEntries;
+
+    private Registrar registrar;
 
     private int entryTime=14;
 
@@ -68,27 +72,55 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     }
 
     //getting the logs from the practitionar and searching for the critical entry
-    public void getCriticalLogs(List<ClientLog> logs){
+    public void getCriticalLogs(List<ClientLog> logs) throws RemoteException {
         for(ClientLog log:logs){
-            for(Capsule entry:entries){
-                //if the facility is the same then go
-                if(log.getEncodedLine().equals(entry.getEncodedLine())){
 
-                    //if the start time from the entry is between the times of the log then go
-                    if(entry.getStartTime().after(log.getEntryTime()) && entry.getStartTime().before(log.getStopTime())){
+            //validating the log
+            if(validateLog(log)) {
+                for (Capsule entry : entries) {
 
-                        //if the token is the same then the user is already informed
-                        if(log.getToken().equals(entry.getToken())){
-                            entry.setInformed(true);
+                    //if the facility is the same then go
+                    if (log.getEncodedLine().equals(entry.getEncodedLine())) {
+
+                        //if the start time from the entry is between the times of the log then go
+                        if (entry.getStartTime().after(log.getEntryTime()) && entry.getStartTime().before(log.getStopTime())) {
+
+                            //if the token is the same then the user is already informed
+                            if (log.getToken().equals(entry.getToken())) {
+                                entry.setInformed(true);
+                            }
+                            criticalEntries.add(entry);
                         }
-                        criticalEntries.add(entry);
                     }
                 }
             }
         }
     }
 
+    //checks if the log is valid
+    public boolean validateLog(ClientLog log) throws RemoteException {
+        String[] split = log.getEntryTime().toString().split(" ");
+        int day=Integer.parseInt(split[2]);
+
+        List<String> pseudonyms= registrar.sendPseudonyms(day);
+
+        String logPseu=" ";
+
+        for(String pseu:pseudonyms){
+            if(pseu.equals(logPseu))return true;
+        }
+
+        return false;
+    }
+
+    //RMI: sends the critical logs
     public  List<Capsule> sendCriticalLogs(){
         return criticalEntries;
     }
+
+    public void connectRegister() throws RemoteException, NotBoundException, MalformedURLException {
+
+        registrar =(Registrar) Naming.lookup("rmi://localhost/Registrar");
+    }
+
 }

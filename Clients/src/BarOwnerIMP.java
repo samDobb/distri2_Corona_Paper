@@ -130,9 +130,9 @@ public class BarOwnerIMP extends UnicastRemoteObject implements BarOwner {
 
             KeySpec spec = new PBEKeySpec(Integer.toString(random).toCharArray());
             SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "SHA-256");
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance("SHA-256");
             cipher.init(Cipher.ENCRYPT_MODE, secret);
 
             String encodedLine = Base64.getEncoder().encodeToString(cipher.doFinal(pseudonyms.get(day).getBytes()));

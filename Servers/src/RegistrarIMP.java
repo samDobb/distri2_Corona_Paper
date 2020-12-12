@@ -218,4 +218,15 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
     }
 
+    //getting the pseudonyms from all the facilities from a specific day
+    public List<String> sendPseudonyms(int day){
+        List<String> allPseudonyms=new ArrayList<>();
+
+        for(OwnerFacility fac:facilities){
+            allPseudonyms.add(fac.getPseu(day));
+        }
+
+        return allPseudonyms;
+    }
+
 }

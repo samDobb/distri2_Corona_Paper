@@ -1,5 +1,6 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 public interface Registrar extends Remote {
 
@@ -12,4 +13,7 @@ public interface Registrar extends Remote {
      void enrollNewUser(String[] details) throws RemoteException;
      boolean checkUserName(String username) throws RemoteException;
      boolean checkUserTel(String telephoneNumber) throws RemoteException;
+
+     //methods for matching service
+    List<String> sendPseudonyms(int day) throws RemoteException;
 }
