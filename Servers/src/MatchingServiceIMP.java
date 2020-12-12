@@ -46,7 +46,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
         entries.addAll(capsuleList);
     }
 
-    //removing all the entries that are longer than 2 weeks ago
+    //removing all the entries that are longer than X weeks
     public void checkEntries() throws ParseException {
 
         Date currentDate = java.util.Calendar.getInstance().getTime();

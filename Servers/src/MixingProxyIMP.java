@@ -122,5 +122,11 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
         matchingService.getInfectedTokens(infectedTokens);
     }
 
+    //flushes the current capsules to the matching service
+    public void flush() throws RemoteException {
+        matchingService.addCapsules(capsules);
+        capsules.clear();
+    }
+
 
 }
