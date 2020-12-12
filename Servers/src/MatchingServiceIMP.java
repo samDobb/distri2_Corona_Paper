@@ -152,4 +152,28 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
         }
     }
 
+    //contact the remaining uninformed
+    public void contactUninformed() throws RemoteException {
+        List<Capsule> uninformedCrits=new ArrayList<>();
+
+        for(CriticalEntry crit:criticalEntries){
+            for(Capsule entry:entries){
+
+                //if the facility is the same then go
+                if (crit.getEncodedLine().equals(entry.getEncodedLine())) {
+
+                    //if the start time from the crit is between the times of the entry then go
+                    if (crit.getStartTime().after(entry.getStartTime()) && crit.getStartTime().before(entry.getEndTime())) {
+                        if (!entry.getInformed()) {
+                            uninformedCrits.add(entry);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        if(!uninformedCrits.isEmpty())registrar.getCrits(uninformedCrits);
+    }
+
 }

@@ -232,4 +232,18 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
         return allPseudonyms;
     }
 
+    public void getCrits(List<Capsule> criticalEntries){
+        List<String> uninformed=new ArrayList<>();
+        for(Capsule capsule:criticalEntries) {
+            for (Client c : clients) {
+                if (c.hasToken(capsule.getToken()) && !uninformed.contains(c.getTelephoneNumber())){
+                    uninformed.add(c.getTelephoneNumber());
+                }
+            }
+        }
+        for(String tel:uninformed){
+            System.out.println("Uninformed: "+tel);
+        }
+    }
+
 }

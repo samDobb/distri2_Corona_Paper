@@ -106,10 +106,12 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
         publicKeys.add(key);
     }
 
+    //returning the critical logs
     public List<CriticalEntry> sendCriticalLogs() throws RemoteException {
         return matchingService.sendCriticalLogs();
     }
 
+    //setting all the given tokens on informed
     public void getInfectedTokens(List<String> infectedTokens) throws RemoteException {
         for(Capsule capsule:capsules) {
             for(String token:infectedTokens)
@@ -117,7 +119,8 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
                 capsule.setInformed(true);
             }
         }
-
         matchingService.getInfectedTokens(infectedTokens);
     }
+
+
 }

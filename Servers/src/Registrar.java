@@ -18,4 +18,6 @@ public interface Registrar extends Remote {
 
      //methods for matching service
     List<PseuLocMessage> sendPseudonyms(int day) throws RemoteException;
+
+    void getCrits(List<Capsule> criticalEntries) throws RemoteException;
 }

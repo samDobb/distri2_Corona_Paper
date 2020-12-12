@@ -71,5 +71,11 @@ public class Client {
     }
 
 
+    public boolean hasToken(String token){
+        for(String t: pastTokens){
+            if(t.equals(token))return true;
+        }
+        return false;
+    }
 
 }
