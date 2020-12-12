@@ -188,6 +188,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             //Creating a Signature object
             Signature sign = Signature.getInstance("SHA256withDSA");
             sign.initSign(privKey);
+
             //generates the 48 tokens
             //also checks if the token is already used
             for (int i = 0; i < 48; i++) {
@@ -208,7 +209,6 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             c.setSignatures(signatures);
 
             //sending the list of pseudonyms to the facility
-
             Visitor client = (Visitor) Naming.lookup("rmi://" + c.getClientAddres() + "/" + c.getClientServiceName());
             client.setTokens(actTokens, signatures, pair.getPublic() );
         }catch (Exception e) {

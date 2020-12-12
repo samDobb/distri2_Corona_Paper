@@ -1,5 +1,9 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Client {
     private String username;
@@ -17,9 +21,12 @@ public class Client {
     public Client(String username,String tel,String clientServiceName,String clientAddres){
         this.username=username;
         this.telephoneNumber=tel;
+        this.clientAddres=clientAddres;
+        this.clientServiceName=clientServiceName;
 
         pastTokens=new ArrayList<>();
         activeTokens=new ArrayList<>();
+        signatures=new ArrayList<>();
     }
 
     public String getUsername() {
@@ -42,9 +49,7 @@ public class Client {
         return clientServiceName;
     }
 
-    public void setClientServiceName(String clientServiceName) {
-        this.clientServiceName = clientServiceName;
-    }
+    public void setClientServiceName(String clientServiceName) {this.clientServiceName = clientServiceName; }
 
     public String getClientAddres() {
         return clientAddres;
@@ -54,6 +59,12 @@ public class Client {
         this.clientAddres = clientAddres;
     }
 
+    public void setActiveTokens(List<String> tokens){
+        activeTokens=tokens;
+    }
+
+    public void setSignatures(List<byte[]> signatures){this.signatures=signatures;}
+
     public void shiftActiveTokens(){
         for(String token:activeTokens){
             pastTokens.add(token);
@@ -61,8 +72,6 @@ public class Client {
         activeTokens.clear();
     }
 
-    public void setActiveTokens(List<String> tokens){
-        activeTokens=tokens;
-    }
-    public void setSignatures(List<byte[]> signatures){this.signatures=signatures;}
+
+
 }

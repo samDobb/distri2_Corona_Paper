@@ -1,20 +1,32 @@
+import java.util.Date;
+
 public class Capsule {
-    private String time;
+    private Date startTime;
+    private Date endTime;
     private String encodedLine;
     private String token;
 
-    Capsule(String time,String line, String token){
-        this.time=time;
+    Capsule(Date startTime, Date endTime, String line, String token){
+        this.startTime=startTime;
+        this.endTime=endTime;
         this.encodedLine=line;
         this.token=token;
     }
 
-    public String getTime() {
-        return time;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public String getEncodedLine() {
