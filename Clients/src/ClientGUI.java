@@ -259,8 +259,8 @@ public class ClientGUI implements FocusListener, ActionListener {
         gbc.gridx = 1;
         gbc.gridy = 6;
         panel.add(writeLogs, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 6;
+        gbc.gridx = 0;
+        gbc.gridy = 7;
         panel.add(getInfections, gbc);
 
 

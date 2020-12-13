@@ -11,7 +11,7 @@ import java.security.Signature;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Doctor {
+public class Doctor  {
 
     private List<ClientLog> logs;
 
@@ -60,6 +60,7 @@ public class Doctor {
             }
             if(matchingService.getCriticalLogs(logs,signature, pair.getPublic())){
                 logs.clear();
+                System.out.println("The doctor Logs have been send");
                 return true;
             }
         }catch (Exception e){

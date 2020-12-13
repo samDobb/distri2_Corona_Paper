@@ -39,6 +39,9 @@ public class DoctorGUI implements FocusListener, ActionListener{
 
         panel = new JPanel();
     }
+    public void sendTheLogs(){
+        this.doctor.sendLogs();
+    }
 
     public void readPatientLogs(){
         try {
@@ -76,10 +79,7 @@ public class DoctorGUI implements FocusListener, ActionListener{
                 if(doctor.getLogsSize()==0){
                     JOptionPane.showMessageDialog(mainFrame, "There are no logs available");
                 }
-                else if(!doctor.sendLogs()){
-                    JOptionPane.showMessageDialog(mainFrame, "Server side error with logs");
-                }
-                else JOptionPane.showMessageDialog(mainFrame, "Logs have been succesfully send!");
+                else JOptionPane.showMessageDialog(mainFrame, "Logs have been succesfully added!");
             }catch (Exception exception){
                 JOptionPane.showMessageDialog(mainFrame, "The logs could not be send");
             }

@@ -90,6 +90,9 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             }
         }
     }
+    public void updateCriticalLogs(){
+
+    }
 
     //getting the logs from the practitioner and searching for the critical entry
     @Override
