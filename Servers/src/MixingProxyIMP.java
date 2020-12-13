@@ -1,4 +1,5 @@
 import javax.security.auth.callback.TextInputCallback;
+import java.nio.charset.StandardCharsets;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -67,7 +68,7 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
                 //verifing if the token is from the current day
                 if (checkToken(token)) {
 
-                    capsules.add(new Capsule(startTime,endTime, encodedLine, token));
+                    capsules.add(new Capsule(startTime,endTime, new String(encodedLine, StandardCharsets.ISO_8859_1), token));
 
                     //creating the signature that will be send back
                     Signature signBack = Signature.getInstance("SHA256withRSA");

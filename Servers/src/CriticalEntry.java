@@ -5,12 +5,12 @@ public class CriticalEntry {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private byte[] encodedLine;
+    private String hash;
 
-    public CriticalEntry(LocalDateTime startTime, LocalDateTime endTime, byte[] line){
+    public CriticalEntry(LocalDateTime startTime, LocalDateTime endTime,String hash){
         this.startTime=startTime;
         this.endTime=endTime;
-        this.encodedLine=line;
+        this.hash=hash;
     }
 
     public LocalDateTime getStartTime() {
@@ -29,11 +29,8 @@ public class CriticalEntry {
         this.endTime = endTime;
     }
 
-    public byte[] getEncodedLine() {
-        return encodedLine;
+    public String getHash() {
+        return this.hash;
     }
 
-    public void setEncodedLine(byte[] encodedLine) {
-        this.encodedLine = encodedLine;
-    }
 }

@@ -35,6 +35,8 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             //setting the registrar in the registry so the clients can find it
             Naming.rebind("rmi://localhost/MatchingService", this);
             System.out.println("MatchingService Server is running");
+            entries=new ArrayList<>();
+            criticalEntries=new ArrayList<>();
 
         }
         catch(Exception e){
@@ -81,7 +83,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                     for (Capsule entry : entries) {
 
                         //if the facility is the same then go
-                        if (log.getHash().equals(new String(entry.getEncodedLine(), StandardCharsets.ISO_8859_1))) {
+                        if (log.getHash().equals(entry.getHash())) {
 
                             //if the start time from the entry is between the times of the log then go
                             if (entry.getStartTime().isAfter(log.getEntryTime()) && entry.getStartTime().isBefore(log.getStopTime())) {
@@ -92,7 +94,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                                     if (log.getToken().equals(entry.getToken())) {
                                         entry.setInformed(true);
                                     }
-                                    criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getEncodedLine()));
+                                    criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getHash()));
                                 }
                             }
                         }
@@ -172,7 +174,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             for(Capsule entry:entries){
 
                 //if the facility is the same then go
-                if (crit.getEncodedLine().equals(entry.getEncodedLine())) {
+                if (crit.getHash().equals(entry.getHash())) {
 
                     //if the start time from the crit is between the times of the entry then go
                     if (crit.getStartTime().isAfter(entry.getStartTime()) && crit.getStartTime().isBefore(entry.getEndTime())) {
@@ -186,6 +188,9 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
         }
 
         if(!uninformedCrits.isEmpty())registrar.getCrits(uninformedCrits);
+    }
+    public void testTimer(){
+        System.out.println("Timer triggerd Matching service");
     }
 
 }

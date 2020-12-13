@@ -5,6 +5,8 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class runServers {
     public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
@@ -12,11 +14,15 @@ public class runServers {
         MixingProxyIMP mixingService=new MixingProxyIMP();
         RegistrarIMP registrarService=new RegistrarIMP();
         matchingService.connectRegister();
+        MatchingScheduler mT=new MatchingScheduler(matchingService);
 
-        LocalDateTime prevTime=  LocalDateTime.now();
-
-        /*while (true){
-            LocalDateTime nextTime= LocalDateTime.now().minusDays(1);
+        LocalDateTime start=  LocalDateTime.now();
+        Timer t= new Timer();
+        TimerTask task = mT;
+        t.schedule(task,1000,5000);
+       /* LocalDateTime prevTime=  LocalDateTime.now();
+        while (true){
+            LocalDateTime nextTime= prevTime.minusDays(1);
 
             if(prevTime.isAfter(nextTime)){
                 prevTime=LocalDateTime.now();

@@ -5,15 +5,15 @@ import java.util.Date;
 public class Capsule {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private byte[] encodedLine;
+    private String hash;
     private String token;
 
     private boolean informed;
 
-    Capsule(LocalDateTime startTime, LocalDateTime endTime, byte[] line, String token){
+    Capsule(LocalDateTime startTime, LocalDateTime endTime, String hash, String token){
         this.startTime=startTime;
         this.endTime=endTime;
-        this.encodedLine=line;
+        this.hash=hash;
         this.token=token;
 
         this.informed=false;
@@ -35,13 +35,10 @@ public class Capsule {
         this.endTime = endTime;
     }
 
-    public byte[] getEncodedLine() {
-        return encodedLine;
+    public String getHash() {
+        return this.hash;
     }
 
-    public void setEncodedLine(byte[] encodedLine) {
-        this.encodedLine = encodedLine;
-    }
 
     public String getToken() {
         return token;
