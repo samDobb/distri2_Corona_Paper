@@ -6,6 +6,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class BarOwner{
@@ -23,7 +26,7 @@ public class BarOwner{
     private Registrar registrar;
     private MixingProxy mixingProxy;
 
-    private byte[] pseudonym;
+    private List<byte[]> pseudonyms;
     private int Ri;
 
     private QRcode qrcode;
@@ -42,6 +45,8 @@ public class BarOwner{
         this.bussinesNumber=number;
         this.bussinesName = bussinesName;
         this.CF=bussinesName+number;
+
+        pseudonyms=new ArrayList<>();
     }
 
     public String getBussinesNumber() {
@@ -72,8 +77,9 @@ public class BarOwner{
     public void connect() throws RemoteException, NotBoundException, MalformedURLException {
         registrar = (Registrar) Naming.lookup("rmi://localhost/Registrar");
         mixingProxy = (MixingProxy) Naming.lookup("rmi://localhost/MixingProxy");
-        //get todays pseudonyms
-        pseudonym=registrar.getPseudonyms(bussinesName,bussinesNumber);
+
+        //get this months pseudonyms
+        pseudonyms=registrar.getPseudonyms(bussinesName,bussinesNumber);
 
     }
 
@@ -95,16 +101,15 @@ public class BarOwner{
         }
     }
 
-    public void getPseudonym() throws RemoteException {
-        pseudonym=registrar.getPseudonyms(bussinesName,bussinesAddres);
-    }
-
     public void generateCurrentQR() {
         this.generateRi();
 
+        LocalDateTime today=LocalDateTime.now();
+        int day=today.getDayOfMonth();
+
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            String line = new String(pseudonym, StandardCharsets.ISO_8859_1);
+            String line = new String(pseudonyms.get(day), StandardCharsets.ISO_8859_1);
             line=Ri+line;
             byte[] encodedLine = md.digest(line.getBytes(StandardCharsets.ISO_8859_1));
 

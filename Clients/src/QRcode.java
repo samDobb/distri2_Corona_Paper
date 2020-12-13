@@ -31,6 +31,6 @@ public class QRcode {
     @Override
     public String toString() {
         String enc= new String(encodedLine, StandardCharsets.ISO_8859_1);
-        return randomNumber+"."+CF+"."+enc;
+        return randomNumber+"/"+CF+"/"+enc;
     }
 }

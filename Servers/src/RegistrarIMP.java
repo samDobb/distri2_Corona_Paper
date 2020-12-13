@@ -88,22 +88,21 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
     //generate pseudonyms for this month for the facility
     @Override
-    public byte[] getPseudonyms(String name,String bussinessNumber){
+    public List<byte[]> getPseudonyms(String name,String bussinessNumber){
 
-      /*  int monthMaxDays = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+        int monthMaxDays = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
 
         List<byte[]> pseudonyms = new ArrayList<>(monthMaxDays);
         LocalDate today=java.time.LocalDate.now();
-        LocalDate day;
-        */
+
         LocalDate day=java.time.LocalDate.now();
 
         try {
             Calendar c = java.util.Calendar.getInstance();
 
             //making a pseudonym for every day of the current month
-         //   for (int i = 0; i < monthMaxDays; i++) {
-            //   day=today.plusDays(i);
+            for (int i = 0; i < monthMaxDays; i++) {
+               day=today.plusDays(i);
                 //create a day specific key
                 byte[]date=day.toString().getBytes();
                 String CF=name+bussinessNumber;
@@ -125,15 +124,14 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
                 String line = new String(encodedLine) + CF +d+m+y;
 
                 byte[] encodedLinePseu = md.digest(line.getBytes());
-                return encodedLinePseu;
 
-             //   pseudonyms.add(encodedLinePseu);
-            //}
+                pseudonyms.add(encodedLinePseu);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return pseudonyms;
     }
 
     //adding a visitor

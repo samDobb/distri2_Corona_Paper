@@ -59,6 +59,10 @@ public class OwnerFacility {
         this.pseudonyms = pseudonyms;
     }
 
+    public void setPseu(int day,byte[] p){
+        pseudonyms.set(day,p);
+    }
+
     public byte[] getPseu(int day){
         return pseudonyms.get(day);
     }

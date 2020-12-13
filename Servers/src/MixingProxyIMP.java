@@ -57,9 +57,6 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
 
     @Override
    public byte[] sendCapsule(LocalDateTime startTime, LocalDateTime endTime, String token, byte[] signature, byte[] encodedLine, PublicKey publicKey){
-        System.out.println();
-        System.out.println(capsules.size());
-
         try {
             //Creating a Signature object
             Signature sign = Signature.getInstance("SHA256withDSA");

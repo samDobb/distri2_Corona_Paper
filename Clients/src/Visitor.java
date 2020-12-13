@@ -128,6 +128,7 @@ public class Visitor {
             System.out.println("No more tokens to spend");
 
         }
+
         if(resp==null){
             System.out.println("Error while verifying your access token");
             return null;
