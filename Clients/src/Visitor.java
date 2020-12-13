@@ -142,7 +142,7 @@ public class Visitor {
             sessionRunning=true;
             this.addLog(qr.getRandomNumber(),qr.getCF(),new String(qr.getEncodedLine(), StandardCharsets.ISO_8859_1),token);
             //start schedule to send capsule each 30 minutes
-            long tsec=tokenTime*100;
+            long tsec=tokenTime*60000;
             firstTokenSent=true;
             tokenScheduler=new VisitorTokenScheduler(this);
             timer.schedule(tokenScheduler,0,tsec);

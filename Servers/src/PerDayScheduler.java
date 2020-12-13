@@ -22,11 +22,7 @@ public class PerDayScheduler extends TimerTask {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        // m.contactUninformed();
-            //m.checkEntries();
-        /*catch (ParseException | RemoteException e) {
-            e.printStackTrace();
-        }*/
+
 
     }
 }

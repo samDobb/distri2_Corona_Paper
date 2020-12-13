@@ -6,6 +6,6 @@ public class runDoctor {
         gui.setView();
         DoctorDayScheduler dT=new DoctorDayScheduler(gui);
         Timer t= new Timer();
-        t.schedule(dT,0,120000);
+        t.schedule(dT,0,86450000);
     }
 }
