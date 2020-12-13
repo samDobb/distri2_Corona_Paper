@@ -4,20 +4,23 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 
 public class ClientGUI implements FocusListener, ActionListener {
     JFrame mainFrame;
     JButton login;
     JButton stop;
     JButton sendCode;
-    JLabel logs,banner,us,qr,con,tel;
+    JLabel logs,banner,us,qr,con,sessionStatus;
     JLabel confirmationCode;
     JTextField userName;
     JTextField cateringInput;
     JPanel panel;
-    Boolean loggedIn;
-    VisitorIMP v;
+    Boolean loggedIn,sessionRunning;
+    Visitor v;
+
 
     public ClientGUI() {
         mainFrame= new JFrame("Horeca");
@@ -25,7 +28,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         stop = new JButton("Stop Visit");
         sendCode=new JButton("Send code");
         logs = new JLabel("Logs"); con=new JLabel("Confirmation: "); us=new JLabel("Register");banner=new JLabel("Signed in as");
-        confirmationCode= new JLabel("Confirmation code will appear here");
+        confirmationCode= new JLabel("Confirmation code will appear here");sessionStatus= new JLabel("Current session is: Not Running");
         userName=new JTextField("Enter username");
         cateringInput=new JTextField("Give Horeca QR");
         panel=new JPanel();
@@ -44,7 +47,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         }
         String tel=new String(buf);
         System.out.println(tel);
-        this.v=new VisitorIMP(username,tel);
+        this.v=new Visitor(username,tel);
         System.out.println(this.v.toString());
         if(v.startClient()){
             System.out.println("Login succes");
@@ -65,7 +68,9 @@ public class ClientGUI implements FocusListener, ActionListener {
         if(values.length!=3){
             return null;
         }
-        QRcode result=new QRcode(Integer.parseInt(values[0]),values[1],values[2]);
+        byte[]s=values[2].getBytes(StandardCharsets.ISO_8859_1);
+        QRcode result=new QRcode(Integer.parseInt(values[0]),values[1],values[2].getBytes(StandardCharsets.ISO_8859_1));
+        System.out.println(result.toString());
         return result;
     }
     @Override
@@ -84,13 +89,29 @@ public class ClientGUI implements FocusListener, ActionListener {
         }
         if(e.getSource()==sendCode){
             if(loggedIn){
+                //interpreter the string
                 QRcode qr=newQRcode(cateringInput.getText());
                 if(qr==null){
                     System.out.println("An error occured while parsing the QRcode");
                 }
                 else{
-                    this.v.readQr(qr);
+                    try {
+                        String result=this.v.readQr(qr);
+                        if(result!=null){
+                            confirmationCode.setText(result);
+                            sessionStatus.setText("Current session is: Running");
+                            sessionRunning=true;
+                        }
+                    } catch (RemoteException remoteException) {
+                        remoteException.printStackTrace();
+                    }
                 }
+            }
+        }
+        if(e.getSource()==stop){
+            if(loggedIn &&sessionRunning){
+                this.v.stopSession();
+                sessionRunning=false;
             }
         }
     }
@@ -151,10 +172,11 @@ public class ClientGUI implements FocusListener, ActionListener {
 
         panel.add(con,gbc);
 
-        gbc.gridx=0;
-        gbc.gridy=5;
+        gbc.gridx=1;
+        gbc.gridy=4;
 
         panel.add(confirmationCode,gbc);
+
 
         gbc.gridx=0;
         gbc.gridy=6;
@@ -166,6 +188,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         login.addActionListener(this);
         sendCode.addActionListener(this);
+        stop.addActionListener(this);
 
 
     }

@@ -1,6 +1,7 @@
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKeyFactory;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -80,7 +81,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                     for (Capsule entry : entries) {
 
                         //if the facility is the same then go
-                        if (log.getEncodedLine().equals(entry.getEncodedLine())) {
+                        if (log.getHash().equals(new String(entry.getEncodedLine(), StandardCharsets.ISO_8859_1))) {
 
                             //if the start time from the entry is between the times of the log then go
                             if (entry.getStartTime().after(log.getEntryTime()) && entry.getStartTime().before(log.getStopTime())) {
@@ -105,6 +106,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     }
 
     //checks if the log is valid
+
     public boolean validateLog(ClientLog log) throws RemoteException, NoSuchAlgorithmException {
         String[] split = log.getEntryTime().toString().split(" ");
         int day=Integer.parseInt(split[2]);
@@ -112,21 +114,30 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
         List<PseuLocMessage> pseudonyms= registrar.sendPseudonyms(day);
 
 
-        byte[] logEncodedLine=log.getEncodedLine();
-        int random = log.getRandom();
+        byte[] logEncodedLine=log.getHash().getBytes(StandardCharsets.ISO_8859_1);
+        int random = log.getRi();
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
 
         //checking for every pseudonym if the newly made pseudonym
         for(PseuLocMessage pseu:pseudonyms){
-
-            String line = new String(logEncodedLine)+random+pseu.getLocation();
+            String line = new String(pseu.getPseudonym(), StandardCharsets.ISO_8859_1);
+            line=random+line;
             byte[] encodedLine = md.digest(line.getBytes());
+            boolean notMatching=false;
+            if(encodedLine.length==logEncodedLine.length){
+                for(int i=0;i<encodedLine.length;i++){
+                    if(encodedLine[i]!=logEncodedLine[i]){
+                        notMatching=true;
+                    }
 
-            if(pseu.getPseudonym().equals(encodedLine))return true;
+                }
+                if(!notMatching){
+                    return true;
+                }
+            }
 
         }
-
         return false;
     }
 

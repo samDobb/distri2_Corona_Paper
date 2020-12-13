@@ -7,20 +7,15 @@ public class Client {
     private String username;
     private String telephoneNumber;
 
-    private String clientServiceName;
-    private String clientAddres;
-
     private List<String> pastTokens;
     private List<String> activeTokens;
 
     private List<byte[]> signatures;
 
 
-    public Client(String username,String tel,String clientServiceName,String clientAddres){
+    public Client(String username,String tel){
         this.username=username;
         this.telephoneNumber=tel;
-        this.clientAddres=clientAddres;
-        this.clientServiceName=clientServiceName;
 
         pastTokens=new ArrayList<>();
         activeTokens=new ArrayList<>();
@@ -41,20 +36,6 @@ public class Client {
 
     public void setTelephoneNumber(String telephoneNumber) {
         this.telephoneNumber = telephoneNumber;
-    }
-
-    public String getClientServiceName() {
-        return clientServiceName;
-    }
-
-    public void setClientServiceName(String clientServiceName) {this.clientServiceName = clientServiceName; }
-
-    public String getClientAddres() {
-        return clientAddres;
-    }
-
-    public void setClientAddres(String clientAddres) {
-        this.clientAddres = clientAddres;
     }
 
     public void setActiveTokens(List<String> tokens){

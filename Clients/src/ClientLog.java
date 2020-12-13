@@ -1,44 +1,24 @@
 import java.util.Date;
 
 public class ClientLog {
-    private int random;
-    private String facilityName;
+    private int Ri;
+    private String CF;
     private String token;
-    private byte[] encodedLine;
+    private String hash;
     private Date entryTime;
     private Date stopTime;
 
-    public ClientLog(int random,String name,String token,byte[] line, Date entryTime,Date stopTime){
-        this.random=random;
-        this.facilityName=name;
+    public ClientLog(int Ri,String CF,String hash,String token, Date entryTime,Date stopTime){
+        this.Ri=Ri;
+        this.CF=CF;
         this.token=token;
-        this.encodedLine=line;
+        this.hash=hash;
         this.entryTime=entryTime;
         this.stopTime=stopTime;
     }
 
-    public int getRandom() {
-        return random;
-    }
-
-    public void setRandom(int random) {
-        this.random = random;
-    }
-
-    public String getFacilityName() {
-        return facilityName;
-    }
-
-    public void setFacilityName(String facilityName) {
-        this.facilityName = facilityName;
-    }
-
-    public byte[] getEncodedLine() {
-        return encodedLine;
-    }
-
-    public void setEncodedLine(byte[] encodedLine) {
-        this.encodedLine = encodedLine;
+    public int getRi() {
+        return Ri;
     }
 
     public Date getEntryTime() {
@@ -55,6 +35,10 @@ public class ClientLog {
 
     public void setStopTime(Date stopTime) {
         this.stopTime = stopTime;
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     public String getToken() {

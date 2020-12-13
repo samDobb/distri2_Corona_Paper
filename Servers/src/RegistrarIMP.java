@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.security.spec.KeySpec;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,9 +35,9 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             Naming.rebind("rmi://localhost/Registrar", this);
             System.out.println("Registrar Server is running");
 
-            //generating the master secret key
+            //KDF key factory to generate pseudonyms
             factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-
+            //generating the master secret key
             KeyGenerator keygen = KeyGenerator.getInstance("AES");
             masterSecretKey = keygen.generateKey();
 
@@ -83,59 +84,61 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
     }
 
 
-    //generate the 48 pseudonyms for the facility
+    //generate pseudonyms for this month for the facility
     @Override
-    public List<byte[]> getPseudonyms(String name,String location){
+    public byte[] getPseudonyms(String name,String bussinessNumber){
 
-        int monthMaxDays = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+      /*  int monthMaxDays = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
 
         List<byte[]> pseudonyms = new ArrayList<>(monthMaxDays);
-
-        byte[] date = java.util.Calendar.getInstance().getTime().toString().getBytes();
+        LocalDate today=java.time.LocalDate.now();
+        LocalDate day;
+        */
+        LocalDate day=java.time.LocalDate.now();
 
         try {
-            KeySpec spec = new PBEKeySpec(name.toCharArray(), date, 1000);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-
-            String encodedLine = Base64.getEncoder().encodeToString(cipher.doFinal(masterSecretKey.getEncoded()));
-
             Calendar c = java.util.Calendar.getInstance();
 
             //making a pseudonym for every day of the current month
-            for (int i = 0; i < monthMaxDays; i++) {
-                c.add(Calendar.DATE, 1);
+         //   for (int i = 0; i < monthMaxDays; i++) {
+            //   day=today.plusDays(i);
+                //create a day specific key
+                byte[]date=day.toString().getBytes();
+                String CF=name+bussinessNumber;
+                KeySpec spec = new PBEKeySpec(CF.toCharArray(), date, 1000,128);
+                SecretKey tmp = factory.generateSecret(spec);
+                SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
 
-                String[] tmpDate = c.getTime().toString().split(" ");
+                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                cipher.init(Cipher.ENCRYPT_MODE, secret);
 
-                String day=tmpDate[2];
-                String month=tmpDate[1];
-                String year=tmpDate[5];
+                String encodedLine = Base64.getEncoder().encodeToString(cipher.doFinal(masterSecretKey.getEncoded()));
+
+                String d= String.valueOf(day.getDayOfMonth());
+                String m= String.valueOf(day.getMonth());
+                String y= String.valueOf(day.getYear());
 
                 MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-                String line = new String(encodedLine) + location + day + month + year;
+                String line = new String(encodedLine) + CF +d+m+y;
 
                 byte[] encodedLinePseu = md.digest(line.getBytes());
+                return encodedLinePseu;
 
-                pseudonyms.add(encodedLinePseu);
-            }
+             //   pseudonyms.add(encodedLinePseu);
+            //}
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return pseudonyms;
+        return null;
     }
 
     //adding a visitor
     @Override
     public void enrollNewUser(String[] details) {
         System.out.println("New client added: "+details[0]+" tel: "+ details[1]);
-        Client client = new Client(details[0], details[1], details[2], details[3]);
+        Client client = new Client(details[0], details[1]);
         clients.add(client);
     }
 

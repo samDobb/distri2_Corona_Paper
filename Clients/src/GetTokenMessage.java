@@ -1,7 +1,9 @@
+import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.List;
 
-public class GetTokenMessage {
+public class GetTokenMessage implements Serializable {
+    private static final long serialVersionUID = 2L;
     private List<String> tokens;
     private List<byte[]> signatures;
     private PublicKey publicKey;

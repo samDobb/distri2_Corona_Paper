@@ -3,10 +3,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy {
 
@@ -71,13 +68,13 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
                     signBack.initSign(privKey);
 
                     //updating the signature with the given encoded line from the facility
-                    signBack.update(Base64.getDecoder().decode(encodedLine));
+                    signBack.update(encodedLine);
 
                     return signBack.sign();
 
                 } else return null;
 
-            }
+            } else return null;
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -85,16 +82,12 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
         return null;
     }
 
-    //check if the token that is send is of today
+    //check if the token that is send is of today and not yet used
     public boolean checkToken(String token){
         String[] splitToken = token.split(" ");
 
         String currentDate= java.util.Calendar.getInstance().getTime().toString();
         String[] splitDate=currentDate.split(" ");
-
-        if(splitDate[2].equals(splitToken[2])){
-            System.out.println("TokenCheck: different time zones ");
-        }
         //if the day name, day number, month number and year numbers are equal then the token is from today
         if(splitDate[0].equals(splitToken[0]) && splitDate[1].equals(splitToken[1]) && splitDate[2].equals(splitToken[2]) && splitDate[5].equals(splitToken[5])){
             return true;
@@ -130,6 +123,7 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
 
     //flushes the current capsules to the matching service
     public void flush() throws RemoteException {
+        Collections.shuffle(capsules);
         matchingService.addCapsules(capsules);
         capsules.clear();
     }

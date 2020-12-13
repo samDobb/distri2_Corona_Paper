@@ -15,7 +15,7 @@ public class runServers {
 
         LocalDateTime prevTime=  LocalDateTime.now();
 
-        while (true){
+        /*while (true){
             LocalDateTime nextTime= LocalDateTime.now().minusDays(1);
 
             if(prevTime.isAfter(nextTime)){
@@ -32,6 +32,6 @@ public class runServers {
                 }
 
             }
-        }
+        }*/
     }
 }
