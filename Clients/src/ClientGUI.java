@@ -112,7 +112,7 @@ public class ClientGUI implements FocusListener, ActionListener {
     }
 
     public QRcode newQRcode(String inputstring) {
-        String[] values = inputstring.split("_");
+        String[] values = inputstring.split(".");
         if (values.length != 3) {
             return null;
         }
