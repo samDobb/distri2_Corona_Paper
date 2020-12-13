@@ -54,6 +54,9 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
     public void addCapsules(List<Capsule> capsuleList){
         entries.addAll(capsuleList);
+        for(Capsule c:capsuleList){
+            System.out.println("Adding capsule"+ c.getToken());
+        }
     }
 
     //removing all the entries that are longer than X weeks
@@ -90,16 +93,13 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             }
         }
     }
-    public void updateCriticalLogs(){
-
-    }
 
     //getting the logs from the practitioner and searching for the critical entry
     @Override
     public boolean getCriticalLogs(List<ClientLog> logs, byte[] signature, PublicKey publicKey) throws RemoteException {
 
         //demo purposses 1 surefire entry that must be informed
-        entries.add(new Capsule(logs.get(0).getEntryTime().minusMinutes(10),logs.get(0).getStopTime(),logs.get(0).getHash(),"token"));
+        //entries.add(new Capsule(logs.get(0).getEntryTime().minusMinutes(10),logs.get(0).getStopTime(),logs.get(0).getHash(),"token"));
 
         try {
             //converting the logs list to a byte array

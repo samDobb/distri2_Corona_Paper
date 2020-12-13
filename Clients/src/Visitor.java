@@ -169,10 +169,19 @@ public class Visitor {
                 LocalDateTime Dbegin=LocalDateTime.now();
                 LocalDateTime Dend=Dbegin.plusMinutes(30);
                 byte[]resp=mixingProxy.sendCapsule(Dbegin,Dend,token,sign,currSesQR.getEncodedLine(),publicKey);
-                if(resp==null)System.out.println("An error occured sending the capsule");
+                if(resp==null){
+                    System.out.println("An error occured sending the capsule");
+                }
+                else{
+                    this.addLog(currSesQR.getRandomNumber(),currSesQR.getCF(),new String(currSesQR.getEncodedLine(), StandardCharsets.ISO_8859_1),token);
+                }
+
             }
             else{
-                System.out.println("No more tokens to spend");
+                System.out.println("No more tokens to spend stopping session");
+                this.stopSession();
+                gui.stopCurrentSession();
+
             }
         }
         else{

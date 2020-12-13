@@ -166,11 +166,7 @@ public class ClientGUI implements FocusListener, ActionListener {
                     }
                     else{
                         this.v.stopSession();
-                        sessionRunning=false;
-                        sessionStatus.setText("Current session is: Not Running");
-                        confirmationCode.setText("Session signature will come here");
-                        cateringInput.setEditable(true);
-                        sendCode.setText("Send QR");
+                        this.stopCurrentSession();
                     }
 
                 }
@@ -188,15 +184,36 @@ public class ClientGUI implements FocusListener, ActionListener {
         }
 
     }
+    public void stopCurrentSession(){
+        sessionRunning=false;
+        sessionStatus.setText("Current session is: Not Running");
+        confirmationCode.setText("Session signature will come here");
+        cateringInput.setEditable(true);
+        sendCode.setText("Send QR");
+    }
 
 
     @Override
     public void focusGained(FocusEvent e) {
+        if(e.getSource()==userName&&userName.getText().equals("Enter username")){
+            userName.setText("");
+        }
+        if(e.getSource()==cateringInput&&cateringInput.getText().equals("Give Horeca QR")){
+            cateringInput.setText("");
+        }
+
 
     }
 
     @Override
     public void focusLost(FocusEvent e) {
+        if(e.getSource()==userName&&userName.getText().equals("")){
+            userName.setText("Enter username");
+        }
+        if(e.getSource()==cateringInput&&cateringInput.getText().equals("")){
+            cateringInput.setText("Give Horeca QR");
+        }
+
 
     }
 
@@ -272,6 +289,8 @@ public class ClientGUI implements FocusListener, ActionListener {
         stop.addActionListener(this);
         writeLogs.addActionListener(this);
         getInfections.addActionListener(this);
+        userName.addFocusListener(this);
+        cateringInput.addFocusListener(this);
 
     }
 
