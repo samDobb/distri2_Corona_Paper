@@ -1,5 +1,9 @@
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKeyFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.rmi.Naming;
@@ -8,6 +12,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -75,14 +81,23 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     }
 
     //getting the logs from the practitioner and searching for the critical entry
-    public boolean getCriticalLogs(List<ClientLog> logs) throws RemoteException {
-
-        entries.add(new Capsule(LocalDateTime.now(),LocalDateTime.now().plusDays(1),"hash","token"));
-        entries.add(new Capsule(LocalDateTime.now(),LocalDateTime.now().plusDays(2),"hash","token2"));
-        entries.add(new Capsule(LocalDateTime.now(),LocalDateTime.now().plusDays(3),"hash","token3"));
-        entries.add(new Capsule(LocalDateTime.now(),LocalDateTime.now().plusDays(4),"hash","token4"));
+    @Override
+    public boolean getCriticalLogs(List<ClientLog> logs, byte[] signature, PublicKey publicKey) throws RemoteException {
 
         try {
+            //converting the logs list to a byte array
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(logs);
+            byte[] newLogs = bos.toByteArray();
+
+            //Creating a Signature object
+            Signature sign = Signature.getInstance("SHA256withDSA");
+            sign.initVerify(publicKey);
+            sign.update(newLogs);
+
+            if(!sign.verify(signature))return false;
+
             for (ClientLog log : logs) {
                 //validating the log
                 if (validateLog(log)) {

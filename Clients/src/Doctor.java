@@ -1,7 +1,13 @@
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.Signature;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +32,31 @@ public class Doctor {
     //sending the logs from the sick patient to the server
     public boolean sendLogs() {
         try {
-            if(matchingService.getCriticalLogs(logs)){
+            //Creating KeyPair generator object
+            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("DSA");
+
+            //Initializing the key pair generator
+            keyPairGen.initialize(2048);
+
+            //Generate the pair of keys
+            KeyPair pair = keyPairGen.generateKeyPair();
+
+            //Getting the privatekey from the key pair
+            PrivateKey privKey = pair.getPrivate();
+            //Creating a Signature object
+            Signature sign = Signature.getInstance("SHA256withDSA");
+            sign.initSign(privKey);
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(logs);
+            byte[] bytes = bos.toByteArray();
+
+            sign.update(bytes);
+            byte[] signature = sign.sign();
+
+
+            if(matchingService.getCriticalLogs(logs,signature, pair.getPublic())){
                 logs.clear();
                 return true;
             }
