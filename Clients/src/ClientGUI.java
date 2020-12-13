@@ -24,6 +24,7 @@ public class ClientGUI implements FocusListener, ActionListener {
     JButton writeLogs;
     JLabel logs, banner, us, qr, con, sessionStatus;
     JLabel confirmationCode;
+    JLabel informedSick;
     JTextField userName;
     JTextField cateringInput;
     JPanel panel;
@@ -41,6 +42,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         con = new JLabel("Confirmation: ");
         us = new JLabel("Register");
         banner = new JLabel("Signed in as");
+        informedSick = new JLabel();
         confirmationCode = new JLabel("Confirmation code will appear here");
         sessionStatus = new JLabel("Current session is: Not Running");
         userName = new JTextField("Enter username");
@@ -50,6 +52,10 @@ public class ClientGUI implements FocusListener, ActionListener {
         banner.setVisible(false);
         loggedIn = false;
 
+    }
+
+    public void setInformed(){
+        informedSick.setText("You are sick!!!");
     }
 
     public void setUser(String username) throws RemoteException {
@@ -62,7 +68,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         }
         String tel = new String(buf);
         System.out.println(tel);
-        this.v = new Visitor(username, tel);
+        this.v = new Visitor(username, tel,this);
         System.out.println(this.v.toString());
         if (v.startClient()) {
             System.out.println("Login succes");
@@ -91,12 +97,6 @@ public class ClientGUI implements FocusListener, ActionListener {
 
             FileWriter writer = new FileWriter(file);
             List<ClientLog> logs=v.getLogs();
-
-            logs.add(new ClientLog(0,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
-            logs.add(new ClientLog(1,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
-            logs.add(new ClientLog(2,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
-            logs.add(new ClientLog(3,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
-            logs.add(new ClientLog(4,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
 
             for(ClientLog log:logs){
                 writer.write(log.toString());
@@ -224,14 +224,18 @@ public class ClientGUI implements FocusListener, ActionListener {
         gbc.gridy = 4;
         panel.add(confirmationCode, gbc);
 
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        panel.add(stop, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        panel.add(informedSick, gbc);
 
         gbc.gridx = 2;
         gbc.gridy = 6;
         panel.add(writeLogs, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        panel.add(stop, gbc);
 
         mainFrame.setContentPane(panel);
         mainFrame.setVisible(true);

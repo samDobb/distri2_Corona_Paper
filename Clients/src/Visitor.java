@@ -33,17 +33,21 @@ public class Visitor {
     private boolean firstTokenSent=false;
     private QRcode currSesQR;
 
+    ClientGUI gui;
+
     private int tokenTime = 30; //in minutes
     private int entryTime = 14; //in days
 
     private VisitorTokenScheduler tokenScheduler;
     private VisitorDayScheduler dayScheduler;
     private Timer timer;
-    public Visitor(String username, String telephoneNumber) throws RemoteException {
+
+    public Visitor(String username, String telephoneNumber, ClientGUI gui) throws RemoteException {
         super();
 
         this.username = username;
         this.telephoneNumber = telephoneNumber;
+        this.gui=gui;
 
         qRcodes = new ArrayList<>();
         qRtimes = new ArrayList<>();
@@ -58,6 +62,7 @@ public class Visitor {
     public String getUsername(){
         return username;
     }
+    public boolean getInfected(){return infected;}
 
     public  List<ClientLog> getLogs(){
         return logs;
@@ -221,6 +226,7 @@ public class Visitor {
                     if(entry.getStartTime().isBefore(log.getStopTime()) && entry.getStartTime().isAfter(log.getEntryTime())){
                         infectedTokens.add(log.getToken());
                         infected=true;
+                        gui.setInformed();
                     }
                 }
             }

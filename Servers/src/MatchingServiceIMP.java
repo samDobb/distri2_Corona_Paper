@@ -96,7 +96,9 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             sign.initVerify(publicKey);
             sign.update(newLogs);
 
-            if(!sign.verify(signature))return false;
+            if(!sign.verify(signature)){
+                return false;
+            }
 
             for (ClientLog log : logs) {
                 //validating the log
@@ -113,7 +115,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                                 if(entry.getInformed()) {
                                     //if the token is the same then the user is already informed
                                     if (log.getToken().equals(entry.getToken())) {
-                                        System.out.println("token is hetzelfd");
+                                        System.out.println("token is hetzelfde");
                                         entry.setInformed(true);
                                     }
                                     criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getHash()));
