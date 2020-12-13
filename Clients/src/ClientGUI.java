@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -90,11 +92,11 @@ public class ClientGUI implements FocusListener, ActionListener {
             FileWriter writer = new FileWriter(file);
             List<ClientLog> logs=v.getLogs();
 
-            logs.add(new ClientLog(0,"test","token","hash",Calendar.getInstance().getTime(),Calendar.getInstance().getTime() ));
-            logs.add(new ClientLog(1,"test","token","hash",Calendar.getInstance().getTime(),Calendar.getInstance().getTime() ));
-            logs.add(new ClientLog(2,"test","token","hash",Calendar.getInstance().getTime(),Calendar.getInstance().getTime() ));
-            logs.add(new ClientLog(3,"test","token","hash",Calendar.getInstance().getTime(),Calendar.getInstance().getTime() ));
-            logs.add(new ClientLog(4,"test","token","hash",Calendar.getInstance().getTime(),Calendar.getInstance().getTime() ));
+            logs.add(new ClientLog(0,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
+            logs.add(new ClientLog(1,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
+            logs.add(new ClientLog(2,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
+            logs.add(new ClientLog(3,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
+            logs.add(new ClientLog(4,"test","token","hash", LocalDateTime.now(),LocalDateTime.now().plusDays(1) ));
 
             for(ClientLog log:logs){
                 writer.write(log.toString());
@@ -102,6 +104,7 @@ public class ClientGUI implements FocusListener, ActionListener {
             }
             writer.close();
 
+            JOptionPane.showMessageDialog(mainFrame, "The logs have been written to file");
         } catch (Exception e) {
             e.printStackTrace();
         }

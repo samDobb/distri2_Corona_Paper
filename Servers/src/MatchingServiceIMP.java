@@ -9,10 +9,10 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingService {
 
@@ -50,15 +50,15 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     //removing all the entries that are longer than X weeks
     public void checkEntries() throws ParseException {
 
-        Date currentDate = java.util.Calendar.getInstance().getTime();
+        LocalDateTime currentDate = LocalDateTime.now();
 
         List<Capsule> removedEntries=new ArrayList<>();
 
         //searching for all the logs that need to be removed
         for(Capsule entry :entries) {
 
-            long diffInMillies = Math.abs(currentDate.getTime() - entry.getStartTime().getTime());
-            long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+            long diff = Math.abs(entry.getEndTime().until(currentDate, ChronoUnit.DAYS));
 
             if(diff > entryTime){
                 removedEntries.add(entry);
@@ -73,7 +73,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     }
 
     //getting the logs from the practitioner and searching for the critical entry
-    public void getCriticalLogs(List<ClientLog> logs) throws RemoteException {
+    public boolean getCriticalLogs(List<ClientLog> logs) throws RemoteException {
         try {
             for (ClientLog log : logs) {
                 //validating the log
@@ -84,7 +84,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                         if (log.getHash().equals(new String(entry.getEncodedLine(), StandardCharsets.ISO_8859_1))) {
 
                             //if the start time from the entry is between the times of the log then go
-                            if (entry.getStartTime().after(log.getEntryTime()) && entry.getStartTime().before(log.getStopTime())) {
+                            if (entry.getStartTime().isAfter(log.getEntryTime()) && entry.getStartTime().isBefore(log.getStopTime())) {
 
                                 //if the user is already informed
                                 if(entry.getInformed()) {
@@ -102,17 +102,18 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
         }catch (Exception e){
             System.out.println("The checking of the Patient logs have been stopped\n");
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     //checks if the log is valid
 
     public boolean validateLog(ClientLog log) throws RemoteException, NoSuchAlgorithmException {
-        String[] split = log.getEntryTime().toString().split(" ");
-        int day=Integer.parseInt(split[2]);
+        LocalDateTime date = log.getEntryTime();
+        int day=date.getDayOfMonth();
 
         List<PseuLocMessage> pseudonyms= registrar.sendPseudonyms(day);
-
 
         byte[] logEncodedLine=log.getHash().getBytes(StandardCharsets.ISO_8859_1);
         int random = log.getRi();
@@ -174,7 +175,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                 if (crit.getEncodedLine().equals(entry.getEncodedLine())) {
 
                     //if the start time from the crit is between the times of the entry then go
-                    if (crit.getStartTime().after(entry.getStartTime()) && crit.getStartTime().before(entry.getEndTime())) {
+                    if (crit.getStartTime().isAfter(entry.getStartTime()) && crit.getStartTime().isBefore(entry.getEndTime())) {
                         if (!entry.getInformed()) {
                             uninformedCrits.add(entry);
                         }

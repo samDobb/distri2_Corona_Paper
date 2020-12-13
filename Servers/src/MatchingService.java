@@ -6,7 +6,7 @@ public interface MatchingService extends Remote {
 
     void addCapsules(List<Capsule> capsuleList)throws RemoteException;
 
-    void getCriticalLogs(List<ClientLog> logs) throws RemoteException;
+    boolean getCriticalLogs(List<ClientLog> logs) throws RemoteException;
 
     List<CriticalEntry> sendCriticalLogs() throws RemoteException;
 

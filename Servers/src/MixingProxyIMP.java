@@ -3,6 +3,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy {
@@ -53,7 +54,7 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
     }
 
     @Override
-   public byte[] sendCapsule(Date startTime, Date endTime, String token, byte[] signature, byte[] encodedLine, PublicKey publicKey){
+   public byte[] sendCapsule(LocalDateTime startTime, LocalDateTime endTime, String token, byte[] signature, byte[] encodedLine, PublicKey publicKey){
         try {
             //Creating a Signature object
             Signature sign = Signature.getInstance("SHA256withDSA");

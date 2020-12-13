@@ -6,6 +6,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,15 +45,14 @@ public class DoctorGUI implements FocusListener, ActionListener{
 
             List<ClientLog> logs=new ArrayList<>();
 
-            SimpleDateFormat formatter=new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-
             while (myReader.hasNextLine()) {
                 String[] data = myReader.nextLine().split("/");
 
-                logs.add(new ClientLog(Integer.parseInt(data[0]),data[1],data[2],data[3],new Date(Long.parseLong(data[4])),new Date(Long.parseLong(data[5]))));
+                logs.add(new ClientLog(Integer.parseInt(data[0]),data[1],data[2],data[3], LocalDateTime.ofEpochSecond(Long.parseLong(data[4]), 0, ZoneOffset.UTC),LocalDateTime.ofEpochSecond(Long.parseLong(data[5]), 0, ZoneOffset.UTC)));
             }
             myReader.close();
             doctor.setLogs(logs);
+            JOptionPane.showMessageDialog(mainFrame, "The logs have been read");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -63,7 +65,13 @@ public class DoctorGUI implements FocusListener, ActionListener{
         }
         else if(e.getSource()==sendLogs){
             try{
-                doctor.sendLogs();
+                if(doctor.getLogsSize()==0){
+                    JOptionPane.showMessageDialog(mainFrame, "There are no logs available");
+                }
+                else if(!doctor.sendLogs()){
+                    JOptionPane.showMessageDialog(mainFrame, "Server side error with logs");
+                }
+                else JOptionPane.showMessageDialog(mainFrame, "Logs have been succesfully send!");
             }catch (Exception exception){
                 JOptionPane.showMessageDialog(mainFrame, "The logs could not be send");
             }

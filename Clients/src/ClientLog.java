@@ -1,15 +1,23 @@
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
-public class ClientLog {
+public class ClientLog implements Serializable{
+
+    private static final long serialVersionUID=2L;
+
     private int Ri;
     private String CF;
     private String token;
     private String hash;
-    private Date entryTime;
-    private Date stopTime;
+    private LocalDateTime entryTime;
+    private LocalDateTime  stopTime;
 
-    public ClientLog(int Ri,String CF,String hash,String token, Date entryTime,Date stopTime){
+    public ClientLog(int Ri,String CF,String hash,String token, LocalDateTime  entryTime,LocalDateTime  stopTime){
         this.Ri=Ri;
         this.CF=CF;
         this.token=token;
@@ -22,24 +30,16 @@ public class ClientLog {
         return Ri;
     }
 
-    public Date getEntryTime() {
-        return entryTime;
+    public void setRi(int ri) {
+        Ri = ri;
     }
 
-    public void setEntryTime(Date entryTime) {
-        this.entryTime = entryTime;
+    public String getCF() {
+        return CF;
     }
 
-    public Date getStopTime() {
-        return stopTime;
-    }
-
-    public void setStopTime(Date stopTime) {
-        this.stopTime = stopTime;
-    }
-
-    public String getHash() {
-        return hash;
+    public void setCF(String CF) {
+        this.CF = CF;
     }
 
     public String getToken() {
@@ -50,8 +50,32 @@ public class ClientLog {
         this.token = token;
     }
 
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public LocalDateTime  getEntryTime() {
+        return entryTime;
+    }
+
+    public void setEntryTime(LocalDateTime  entryTime) {
+        this.entryTime = entryTime;
+    }
+
+    public LocalDateTime  getStopTime() {
+        return stopTime;
+    }
+
+    public void setStopTime(LocalDateTime  stopTime) {
+        this.stopTime = stopTime;
+    }
+
     @Override
     public String toString() {
-       return Ri+"/"+CF+"/"+token+"/"+hash+"/"+entryTime.getTime()+"/"+stopTime.getTime();
+       return Ri+"/"+CF+"/"+token+"/"+hash+"/"+entryTime.toEpochSecond( ZoneOffset.UTC)+"/"+stopTime.toEpochSecond( ZoneOffset.UTC);
     }
 }

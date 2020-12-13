@@ -5,8 +5,10 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.PublicKey;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -96,11 +98,11 @@ public class Visitor {
         pastTokens.add(token);
         activeTokens.remove(token);
         signatures.remove(sign);
-        LocalDateTime Dbegin=java.time.LocalDateTime.now();
+
+        LocalDateTime Dbegin=LocalDateTime.now();
         LocalDateTime Dend=Dbegin.plusMinutes(30);
-        Date begin=Date.from(Dbegin.atZone(ZoneId.systemDefault()).toInstant());
-        Date end=Date.from(Dend.atZone(ZoneId.systemDefault()).toInstant());
-        byte[]resp=mixingProxy.sendCapsule(begin,end,token,sign,qr.getEncodedLine(),publicKey);
+
+        byte[]resp=mixingProxy.sendCapsule(Dbegin,Dend,token,sign,qr.getEncodedLine(),publicKey);
         if(resp==null){
             System.out.println("Error while verifying your access token");
             return null;
@@ -120,11 +122,10 @@ public class Visitor {
 
     //add a log
     public void addLog(int Ri, String CF, String hash, String token) {
-        Date firstDate = java.util.Calendar.getInstance().getTime();
+        LocalDateTime firstDate = LocalDateTime.now();
 
-        Calendar c = java.util.Calendar.getInstance();
-        c.add(Calendar.MINUTE, 30);
-        Date secondDate = c.getTime();
+
+        LocalDateTime secondDate = LocalDateTime.now().plusMinutes(30);
 
         logs.add(new ClientLog(Ri, CF, hash, token, firstDate, secondDate));
     }
@@ -132,15 +133,14 @@ public class Visitor {
     //remove all the logs where the time is longer than 2 weeks ago
     public void removeLogs() throws ParseException {
 
-        Date currentDate = java.util.Calendar.getInstance().getTime();
+        LocalDateTime currentDate = LocalDateTime.now();
 
         List<ClientLog> removedLogs = new ArrayList<>();
 
         //searching for all the logs that need to be removed
         for (ClientLog log : logs) {
 
-            long diffInMillies = Math.abs(currentDate.getTime() - log.getEntryTime().getTime());
-            long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            long diff = Math.abs(log.getEntryTime().until(currentDate, ChronoUnit.DAYS));
 
             if (diff > entryTime) {
                 removedLogs.add(log);
