@@ -82,7 +82,7 @@ public class ClientGUI implements FocusListener, ActionListener {
     public void writeDownLogs() {
         try {
 
-            File file = new File("patientLogs.txt");
+            File file = new File(v.getUsername()+"Logs.txt");
             if (file.createNewFile()) {
                 System.out.println("File created: " + file.getName());
             } else {

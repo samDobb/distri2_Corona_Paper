@@ -21,6 +21,8 @@ public class DoctorGUI implements FocusListener, ActionListener{
     JButton sendLogs;
     JButton readLogs;
     JPanel panel;
+    JTextField fileName;
+
     Doctor doctor;
 
     public DoctorGUI(){
@@ -33,13 +35,18 @@ public class DoctorGUI implements FocusListener, ActionListener{
         mainFrame = new JFrame("Doctor");
         sendLogs = new JButton("Send Infected Patient Logs");
         readLogs = new JButton("Read Patient Logs");
+        fileName = new JTextField("Filename");
 
         panel = new JPanel();
     }
 
     public void readPatientLogs(){
         try {
-            File file = new File("patientLogs.txt");
+            if(fileName.getText().isBlank()){
+                JOptionPane.showMessageDialog(mainFrame, "Please give the filename");
+                return;
+            }
+            File file = new File(fileName.getText()+".txt");
 
             Scanner myReader = new Scanner(file);
 
@@ -51,10 +58,11 @@ public class DoctorGUI implements FocusListener, ActionListener{
                 logs.add(new ClientLog(Integer.parseInt(data[0]),data[1],data[2],data[3], LocalDateTime.ofEpochSecond(Long.parseLong(data[4]), 0, ZoneOffset.UTC),LocalDateTime.ofEpochSecond(Long.parseLong(data[5]), 0, ZoneOffset.UTC)));
             }
             myReader.close();
-            doctor.setLogs(logs);
+            doctor.addLogs(logs);
             JOptionPane.showMessageDialog(mainFrame, "The logs have been read");
         }catch (Exception e){
             e.printStackTrace();
+            JOptionPane.showMessageDialog(mainFrame, "There is no such file");
         }
     }
 
@@ -106,6 +114,10 @@ public class DoctorGUI implements FocusListener, ActionListener{
         gbc.gridx = 1;
         gbc.gridy = 3;
         panel.add(sendLogs, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(fileName, gbc);
 
 
         mainFrame.setContentPane(panel);

@@ -26,7 +26,10 @@ public class Doctor {
     //sending the logs from the sick patient to the server
     public boolean sendLogs() {
         try {
-            return matchingService.getCriticalLogs(logs);
+            if(matchingService.getCriticalLogs(logs)){
+                logs.clear();
+                return true;
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -39,6 +42,10 @@ public class Doctor {
 
     public void setLogs(List<ClientLog> logs){
         this.logs=logs;
+    }
+
+    public void addLogs(List<ClientLog> logs){
+        this.logs.addAll(logs);
     }
 
 }

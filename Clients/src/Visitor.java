@@ -56,6 +56,10 @@ public class Visitor {
 
     }
 
+    public String getUsername(){
+        return username;
+    }
+
     public  List<ClientLog> getLogs(){
         return logs;
     }
