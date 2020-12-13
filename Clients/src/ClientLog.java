@@ -1,3 +1,4 @@
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 public class ClientLog {
@@ -47,5 +48,10 @@ public class ClientLog {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    @Override
+    public String toString() {
+       return Ri+"/"+CF+"/"+token+"/"+hash+"/"+entryTime.getTime()+"/"+stopTime.getTime();
     }
 }

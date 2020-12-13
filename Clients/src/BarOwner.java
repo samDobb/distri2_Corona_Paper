@@ -1,23 +1,11 @@
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.security.spec.KeySpec;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Scanner;
 
 
 public class BarOwner{
@@ -79,13 +67,16 @@ public class BarOwner{
     public void setBussinesAddres(String bussisnesAddres) {
         this.bussinesAddres = bussisnesAddres;
     }
+
+    //connecting to servers
     public void connect() throws RemoteException, NotBoundException, MalformedURLException {
         registrar = (Registrar) Naming.lookup("rmi://localhost/Registrar");
         mixingProxy = (MixingProxy) Naming.lookup("rmi://localhost/MixingProxy");
-        //get this months pseudonyms
+        //get todays pseudonyms
         pseudonym=registrar.getPseudonyms(bussinesName,bussinesNumber);
 
     }
+
     public void generateRi(){
         SecureRandom rand= new SecureRandom();
         Ri= rand.nextInt(9000);
@@ -117,6 +108,7 @@ public class BarOwner{
             String line = new String(pseudonym, StandardCharsets.ISO_8859_1);
             line=Ri+line;
             byte[] encodedLine = md.digest(line.getBytes(StandardCharsets.ISO_8859_1));
+
             //making the code
             qrcode = new QRcode(Ri, CF, encodedLine);
             System.out.println("Showing QR:");
@@ -127,6 +119,7 @@ public class BarOwner{
         }
 
     }
+
     public QRcode getQrcode(){
         return this.qrcode;
     }

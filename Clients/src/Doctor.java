@@ -25,7 +25,11 @@ public class Doctor {
 
     //sending the logs from the sick patient to the server
     public void sendLogs() throws RemoteException {
-       matchingService.getCriticalLogs(logs);
+      if(!logs.isEmpty()) matchingService.getCriticalLogs(logs);
+    }
+
+    public void setLogs(List<ClientLog> logs){
+        this.logs=logs;
     }
 
 }

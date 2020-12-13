@@ -53,6 +53,10 @@ public class Visitor {
         logs=new ArrayList<>();
 
     }
+
+    public  List<ClientLog> getLogs(){
+        return logs;
+    }
     //making connection to the registry and starting the rmi for this facility
     public boolean startClient() {
 
