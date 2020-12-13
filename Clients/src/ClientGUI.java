@@ -140,6 +140,7 @@ public class ClientGUI implements FocusListener, ActionListener {
                 //interpreter the string
                 QRcode qr = newQRcode(cateringInput.getText());
                 if (qr == null) {
+                    JOptionPane.showMessageDialog(mainFrame, "An error while sending your QR code occured");
                     System.out.println("An error occured while parsing the QRcode");
                 } else {
                     try {
@@ -148,6 +149,7 @@ public class ClientGUI implements FocusListener, ActionListener {
                             confirmationCode.setText(result);
                             sessionStatus.setText("Current session is: Running");
                             sessionRunning = true;
+                            JOptionPane.showMessageDialog(mainFrame, "QR code sent!");
                         }
                     } catch (RemoteException remoteException) {
                         remoteException.printStackTrace();

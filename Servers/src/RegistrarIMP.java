@@ -171,7 +171,6 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
         RandomToken randomGen = new RandomToken();
 
-        LocalDateTime today=java.time.LocalDateTime.now();
         Client client=null;
         GetTokenMessage tokenMessage=null;
         for(Client c:clients){
@@ -199,7 +198,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             //also checks if the token is already used
             DateTimeFormatter formatter= DateTimeFormatter.ISO_DATE_TIME;
             for (int i = 0; i < 48; i++) {
-                LocalDateTime next=today.plusDays(i);
+                LocalDateTime next=LocalDateTime.now();
                 String dateString=next.format(formatter);
                 String newToken = dateString + " " + randomGen.nextString();
 
