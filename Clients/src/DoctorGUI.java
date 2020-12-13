@@ -55,7 +55,7 @@ public class DoctorGUI implements FocusListener, ActionListener{
             while (myReader.hasNextLine()) {
                 String[] data = myReader.nextLine().split("/");
 
-                logs.add(new ClientLog(Integer.parseInt(data[0]),data[1],data[2],data[3], LocalDateTime.ofEpochSecond(Long.parseLong(data[4]), 0, ZoneOffset.UTC),LocalDateTime.ofEpochSecond(Long.parseLong(data[5]), 0, ZoneOffset.UTC)));
+                logs.add(new ClientLog(Integer.parseInt(data[0]),data[1],data[3],data[2], LocalDateTime.ofEpochSecond(Long.parseLong(data[4]), 0, ZoneOffset.UTC),LocalDateTime.ofEpochSecond(Long.parseLong(data[5]), 0, ZoneOffset.UTC)));
             }
             myReader.close();
             doctor.addLogs(logs);

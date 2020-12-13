@@ -16,7 +16,6 @@ public class BarOwner{
     private static final long serialVersionUID = 1L;
 
     private String bussinesNumber;
-    private String telephoneNumber;
 
     private String bussinesName;
     private String bussinesAddres;
@@ -77,6 +76,9 @@ public class BarOwner{
     public void connect() throws RemoteException, NotBoundException, MalformedURLException {
         registrar = (Registrar) Naming.lookup("rmi://localhost/Registrar");
         mixingProxy = (MixingProxy) Naming.lookup("rmi://localhost/MixingProxy");
+
+        String[] details = {bussinesName,bussinesAddres,bussinesNumber};
+        registrar.enrollFacility(details);
 
         //get this months pseudonyms
         pseudonyms=registrar.getPseudonyms(bussinesName,bussinesNumber);

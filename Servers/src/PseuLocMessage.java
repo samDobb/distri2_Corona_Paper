@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.List;
 
-public class PseuLocMessage {
+public class PseuLocMessage implements Serializable {
     private byte[] pseudonym;
     private String location;
 

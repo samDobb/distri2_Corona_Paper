@@ -68,7 +68,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
     //details: name, service addres, service name
     @Override
     public void enrollFacility(String[] details) {
-        OwnerFacility owner = new OwnerFacility(details[0], details[1], details[2], details[3]);
+        OwnerFacility owner = new OwnerFacility(details[0], details[1], details[2]);
         facilities.add(owner);
     }
 
@@ -130,6 +130,12 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        for(OwnerFacility o : facilities){
+            if(o.getName().equals(name) && o.getTelephoneNumber().equals(bussinessNumber)){
+                o.setPseudonyms(pseudonyms);
+            }
         }
         return pseudonyms;
     }

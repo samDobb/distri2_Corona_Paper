@@ -4,17 +4,14 @@ import java.util.List;
 public class OwnerFacility {
     private String name;
     private String location;
-
-    private String clientServiceName;
-    private String clientAddres;
+    private String telephoneNumber;
 
     private List<byte[]> pseudonyms;
 
-    OwnerFacility(String name,String location,String clientServiceName,String clientAddres){
+    OwnerFacility(String name,String location, String telephoneNumber){
         this.name=name;
         this.location=location;
-        this.clientAddres=clientAddres;
-        this.clientServiceName=clientServiceName;
+        this.telephoneNumber=telephoneNumber;
 
         pseudonyms=new ArrayList<>();
     }
@@ -35,22 +32,6 @@ public class OwnerFacility {
         this.location = location;
     }
 
-    public String getClientServiceName() {
-        return clientServiceName;
-    }
-
-    public void setClientServiceName(String clientServiceName) {
-        this.clientServiceName = clientServiceName;
-    }
-
-    public String getClientAddres() {
-        return clientAddres;
-    }
-
-    public void setClientAddres(String clientAddres) {
-        this.clientAddres = clientAddres;
-    }
-
     public List<byte[]> getPseudonyms() {
         return pseudonyms;
     }
@@ -61,6 +42,14 @@ public class OwnerFacility {
 
     public void setPseu(int day,byte[] p){
         pseudonyms.set(day,p);
+    }
+
+    public String getTelephoneNumber() {
+        return telephoneNumber;
+    }
+
+    public void setTelephoneNumber(String telephoneNumber) {
+        this.telephoneNumber = telephoneNumber;
     }
 
     public byte[] getPseu(int day){

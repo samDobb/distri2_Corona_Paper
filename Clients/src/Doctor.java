@@ -55,7 +55,9 @@ public class Doctor {
             sign.update(bytes);
             byte[] signature = sign.sign();
 
-
+            for(ClientLog log:logs){
+                System.out.println(log.toString());
+            }
             if(matchingService.getCriticalLogs(logs,signature, pair.getPublic())){
                 logs.clear();
                 return true;

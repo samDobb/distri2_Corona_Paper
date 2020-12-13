@@ -114,13 +114,14 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             for (ClientLog log : logs) {
                 //validating the log
                 if (validateLog(log)) {
+
                     for (Capsule entry : entries) {
 
                         //if the facility is the same then go
                         if (log.getHash().equals(entry.getHash())) {
 
                             //if the start time from the entry is between the times of the log then go
-                            if (entry.getStartTime().isAfter(log.getEntryTime()) && entry.getStartTime().isBefore(log.getStopTime())) {
+                            if (log.getEntryTime().isAfter(entry.getStartTime()) && log.getEntryTime().isBefore(entry.getEndTime())) {
 
                                 //if the user is already informed
                                 if(entry.getInformed()) {
@@ -131,6 +132,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                                     }
                                     criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getHash()));
                                 }
+                                System.out.println(criticalEntries.size());
                             }
                         }
                     }
@@ -157,18 +159,15 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-        System.out.println("pseu length: "+pseudonyms.size());
-
         //checking for every pseudonym if the newly made pseudonym
         for(PseuLocMessage pseu:pseudonyms){
 
             String line = new String(pseu.getPseudonym(), StandardCharsets.ISO_8859_1);
             line=random+line;
 
-            String hash = new String(md.digest(line.getBytes()),StandardCharsets.ISO_8859_1);
+            String hash = new String(md.digest(line.getBytes(StandardCharsets.ISO_8859_1)),StandardCharsets.ISO_8859_1);
 
             if(hash.equals(logHash)){
-                System.out.println("hash is equal");
                     return true;
             }
 
