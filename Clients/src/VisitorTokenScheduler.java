@@ -1,10 +1,10 @@
 import java.rmi.RemoteException;
 import java.util.TimerTask;
 
-public class TokenScheduler extends TimerTask {
+public class VisitorTokenScheduler extends TimerTask {
     private Visitor v;
 
-    public TokenScheduler(Visitor v){
+    public VisitorTokenScheduler(Visitor v){
         this.v=v;
     }
     @Override

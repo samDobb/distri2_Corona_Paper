@@ -1,16 +1,11 @@
-import javax.imageio.spi.RegisterableService;
 import java.nio.charset.StandardCharsets;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.security.PublicKey;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Visitor {
     private String username;
@@ -41,7 +36,8 @@ public class Visitor {
     private int tokenTime = 30; //in minutes
     private int entryTime = 14; //in days
 
-    private TokenScheduler scheduler;
+    private VisitorTokenScheduler tokenScheduler;
+    private VisitorDayScheduler dayScheduler;
     private Timer timer;
     public Visitor(String username, String telephoneNumber) throws RemoteException {
         super();
@@ -54,7 +50,8 @@ public class Visitor {
         signatures = new ArrayList<>();
         pastTokens=new ArrayList<>();
         logs=new ArrayList<>();
-        scheduler=new TokenScheduler(this);
+        tokenScheduler=new VisitorTokenScheduler(this);
+        dayScheduler=new VisitorDayScheduler(this);
         timer=new Timer();
     }
 
@@ -77,11 +74,8 @@ public class Visitor {
                 //registering this visitor to the registrar
                 String[] details = {username, telephoneNumber};
                 registrar.enrollNewUser(details);
-                //setting inital tokens
-                GetTokenMessage m=registrar.generateUserToken(username,publicKey);
-                activeTokens=m.getTokens();
-                signatures=m.getSignatures();
-                publicKey=m.getPublicKey();
+                //execute certain functions every day
+                timer.schedule(dayScheduler,0,86400000);
                 return true;
             }
             else{
@@ -93,6 +87,13 @@ public class Visitor {
         }
 
         return false;
+    }
+    public void setNewTokens() throws RemoteException {
+        //setting tokens
+        GetTokenMessage m=registrar.generateUserToken(username,publicKey);
+        activeTokens=m.getTokens();
+        signatures=m.getSignatures();
+        publicKey=m.getPublicKey();
     }
 
 
@@ -132,7 +133,7 @@ public class Visitor {
             //start schedule to send capsule each 30 minutes
             long tsec=tokenTime*60000;
             firstTokenSent=true;
-            timer.schedule(scheduler,0,tsec);
+            timer.schedule(tokenScheduler,0,tsec);
             currSesQR=qr;
             return sessionSign;
         }
@@ -140,7 +141,7 @@ public class Visitor {
     public void stopSession(){
         sessionRunning=false;
         //stop sending capsules
-        scheduler.cancel();
+        tokenScheduler.cancel();
     }
     public void sendSessionCapsule() throws RemoteException {
         //skip first execution
@@ -179,7 +180,7 @@ public class Visitor {
     }
 
     //remove all the logs where the time is longer than 2 weeks ago
-    public void removeLogs() throws ParseException {
+    public void removeLogs() {
 
         LocalDateTime currentDate = LocalDateTime.now();
 
@@ -206,17 +207,18 @@ public class Visitor {
         for (String token : activeTokens) {
             pastTokens.add(token);
         }
+        signatures.clear();
         activeTokens.clear();
     }
 
-   /* public void getCriticalEntries() throws RemoteException {
+    public void getCriticalEntries() throws RemoteException {
         List<CriticalEntry> criticalEntries = mixingProxy.sendCriticalLogs();
         List<String> infectedTokens = new ArrayList<>();
 
         for (CriticalEntry entry : criticalEntries) {
             for (ClientLog log : logs) {
-                if (entry.getEncodedLine().equals(log.getEncodedLine())) {
-                    if(entry.getStartTime().before(log.getStopTime()) && entry.getStartTime().after(log.getEntryTime())){
+                if (entry.getHash().equals(log.getHash())) {
+                    if(entry.getStartTime().isBefore(log.getStopTime()) && entry.getStartTime().isAfter(log.getEntryTime())){
                         infectedTokens.add(log.getToken());
                         infected=true;
                     }
@@ -225,7 +227,7 @@ public class Visitor {
         }
 
         mixingProxy.getInfectedTokens(infectedTokens);
-    }*/
+    }
 
 
     @Override

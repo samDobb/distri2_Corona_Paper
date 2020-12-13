@@ -10,6 +10,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.security.spec.KeySpec;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -169,7 +170,7 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
         RandomToken randomGen = new RandomToken();
 
-        String date = java.util.Calendar.getInstance().getTime().toString();
+        LocalDateTime today=java.time.LocalDateTime.now();
         Client client=null;
         GetTokenMessage tokenMessage=null;
         for(Client c:clients){
@@ -196,8 +197,9 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
             //generates the 48 tokens
             //also checks if the token is already used
             for (int i = 0; i < 48; i++) {
-
-                String newToken = date + " " + randomGen.nextString();
+                LocalDateTime next=today.plusDays(i);
+                String dateString=next.toString();
+                String newToken = dateString + " " + randomGen.nextString();
 
                 //checking if token is the a duplicate
                 if (!actTokens.contains(newToken)) {
