@@ -42,7 +42,7 @@ public class DoctorGUI implements FocusListener, ActionListener{
 
     public void readPatientLogs(){
         try {
-            if(fileName.getText().isBlank()){
+            if(fileName.getText().isEmpty()){
                 JOptionPane.showMessageDialog(mainFrame, "Please give the filename");
                 return;
             }

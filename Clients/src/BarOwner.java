@@ -104,7 +104,6 @@ public class BarOwner{
 
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-
             String line = new String(pseudonym, StandardCharsets.ISO_8859_1);
             line=Ri+line;
             byte[] encodedLine = md.digest(line.getBytes(StandardCharsets.ISO_8859_1));

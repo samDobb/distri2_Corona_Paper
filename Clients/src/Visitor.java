@@ -9,10 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Visitor {
@@ -38,10 +35,14 @@ public class Visitor {
 
     private boolean infected=false;
     private boolean sessionRunning=false;
+    private boolean firstTokenSent=false;
+    private QRcode currSesQR;
 
     private int tokenTime = 30; //in minutes
     private int entryTime = 14; //in days
 
+    private TokenScheduler scheduler;
+    private Timer timer;
     public Visitor(String username, String telephoneNumber) throws RemoteException {
         super();
 
@@ -53,7 +54,8 @@ public class Visitor {
         signatures = new ArrayList<>();
         pastTokens=new ArrayList<>();
         logs=new ArrayList<>();
-
+        scheduler=new TokenScheduler(this);
+        timer=new Timer();
     }
 
     public String getUsername(){
@@ -95,18 +97,28 @@ public class Visitor {
 
 
     public String readQr(QRcode qr) throws RemoteException {
-        qRcodes.add(qr);
-        qRtimes.add(java.util.Calendar.getInstance());
-        String token=activeTokens.get(0);
-        byte[] sign=signatures.get(0);
-        pastTokens.add(token);
-        activeTokens.remove(token);
-        signatures.remove(sign);
+        byte[]resp;
+        String token;
+        if(!activeTokens.isEmpty()){
+            qRcodes.add(qr);
+            qRtimes.add(java.util.Calendar.getInstance());
+            token=activeTokens.get(0);
+            byte[] sign=signatures.get(0);
+            pastTokens.add(token);
+            activeTokens.remove(token);
+            signatures.remove(sign);
+            System.out.println("Remaining tokens: " + activeTokens.size());
+            LocalDateTime Dbegin=LocalDateTime.now();
+            LocalDateTime Dend=Dbegin.plusMinutes(30);
 
-        LocalDateTime Dbegin=LocalDateTime.now();
-        LocalDateTime Dend=Dbegin.plusMinutes(30);
+            resp=mixingProxy.sendCapsule(Dbegin,Dend,token,sign,qr.getEncodedLine(),publicKey);
+        }
+        else{
+            token=null;
+            resp=null;
+            System.out.println("No more tokens to spend");
 
-        byte[]resp=mixingProxy.sendCapsule(Dbegin,Dend,token,sign,qr.getEncodedLine(),publicKey);
+        }
         if(resp==null){
             System.out.println("Error while verifying your access token");
             return null;
@@ -117,17 +129,49 @@ public class Visitor {
             System.out.println("Session signature received");
             sessionRunning=true;
             this.addLog(qr.getRandomNumber(),qr.getCF(),new String(qr.getEncodedLine(), StandardCharsets.ISO_8859_1),token);
+            //start schedule to send capsule each 30 minutes
+            long tsec=tokenTime*60000;
+            firstTokenSent=true;
+            timer.schedule(scheduler,0,tsec);
+            currSesQR=qr;
             return sessionSign;
         }
     }
     public void stopSession(){
         sessionRunning=false;
+        //stop sending capsules
+        scheduler.cancel();
+    }
+    public void sendSessionCapsule() throws RemoteException {
+        //skip first execution
+        if(!firstTokenSent){
+            if(!activeTokens.isEmpty()){
+                System.out.println("Spending another token");
+                String token=activeTokens.get(0);
+                byte[] sign=signatures.get(0);
+                pastTokens.add(token);
+                activeTokens.remove(token);
+                System.out.println("Remaining tokens: " + activeTokens.size());
+                signatures.remove(sign);
+                LocalDateTime Dbegin=LocalDateTime.now();
+                LocalDateTime Dend=Dbegin.plusMinutes(30);
+                byte[]resp=mixingProxy.sendCapsule(Dbegin,Dend,token,sign,currSesQR.getEncodedLine(),publicKey);
+            }
+            else{
+                System.out.println("No more tokens to spend");
+            }
+        }
+        else{
+            firstTokenSent=false;
+        }
+
+
+
     }
 
     //add a log
     public void addLog(int Ri, String CF, String hash, String token) {
         LocalDateTime firstDate = LocalDateTime.now();
-
 
         LocalDateTime secondDate = LocalDateTime.now().plusMinutes(30);
 
