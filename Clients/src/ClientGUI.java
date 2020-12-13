@@ -21,7 +21,7 @@ public class ClientGUI implements FocusListener, ActionListener {
     JButton login;
     JButton stop;
     JButton sendCode;
-    JButton writeLogs;
+    JButton writeLogs,getInfections;
     JLabel logs, banner, us, qr, con, sessionStatus;
     JLabel confirmationCode;
     JLabel informedSick;
@@ -38,6 +38,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         stop = new JButton("Stop Visit");
         sendCode = new JButton("Send code");
         writeLogs = new JButton("Write Logs");
+        getInfections= new JButton("Demo Infected?");
         logs = new JLabel("Logs");
         con = new JLabel("Confirmation: ");
         us = new JLabel("Register");
@@ -178,6 +179,13 @@ public class ClientGUI implements FocusListener, ActionListener {
         if (e.getSource() == writeLogs) {
             writeDownLogs();
         }
+        if(e.getSource()==getInfections){
+            try {
+                this.v.getCriticalEntries();
+            } catch (RemoteException remoteException) {
+                remoteException.printStackTrace();
+            }
+        }
 
     }
 
@@ -251,6 +259,9 @@ public class ClientGUI implements FocusListener, ActionListener {
         gbc.gridx = 1;
         gbc.gridy = 6;
         panel.add(writeLogs, gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 6;
+        panel.add(getInfections, gbc);
 
 
         mainFrame.setContentPane(panel);
@@ -260,7 +271,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         sendCode.addActionListener(this);
         stop.addActionListener(this);
         writeLogs.addActionListener(this);
-
+        getInfections.addActionListener(this);
 
     }
 

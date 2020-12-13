@@ -17,6 +17,7 @@ public class PerDayScheduler extends TimerTask {
         //remove overtime capsules
         m.removeCapsules();
         try {
+            System.out.println("Going to flush the received capsules");
             mx.flush();
         } catch (RemoteException e) {
             e.printStackTrace();

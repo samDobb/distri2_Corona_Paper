@@ -20,7 +20,7 @@ public class runServers {
         LocalDateTime start=  LocalDateTime.now();
         System.out.println(start.toString());
         Timer t= new Timer();
-        t.schedule(perDay,0,86400000);
+        t.schedule(perDay,0,100000);
 
     }
 }

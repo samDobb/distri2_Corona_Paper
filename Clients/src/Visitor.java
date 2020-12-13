@@ -142,7 +142,7 @@ public class Visitor {
             sessionRunning=true;
             this.addLog(qr.getRandomNumber(),qr.getCF(),new String(qr.getEncodedLine(), StandardCharsets.ISO_8859_1),token);
             //start schedule to send capsule each 30 minutes
-            long tsec=tokenTime*60000;
+            long tsec=tokenTime*100;
             firstTokenSent=true;
             tokenScheduler=new VisitorTokenScheduler(this);
             timer.schedule(tokenScheduler,0,tsec);
@@ -169,6 +169,7 @@ public class Visitor {
                 LocalDateTime Dbegin=LocalDateTime.now();
                 LocalDateTime Dend=Dbegin.plusMinutes(30);
                 byte[]resp=mixingProxy.sendCapsule(Dbegin,Dend,token,sign,currSesQR.getEncodedLine(),publicKey);
+                if(resp==null)System.out.println("An error occured sending the capsule");
             }
             else{
                 System.out.println("No more tokens to spend");
@@ -230,6 +231,7 @@ public class Visitor {
         for (CriticalEntry entry : criticalEntries) {
             for (ClientLog log : logs) {
                 if (entry.getHash().equals(log.getHash())) {
+                    System.out.println("Hashes match!");
                     if(entry.getStartTime().isBefore(log.getStopTime()) && entry.getStartTime().isAfter(log.getEntryTime())){
                         infectedTokens.add(log.getToken());
                         infected=true;

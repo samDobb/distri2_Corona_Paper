@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class CriticalEntry {
+public class CriticalEntry implements Serializable {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
