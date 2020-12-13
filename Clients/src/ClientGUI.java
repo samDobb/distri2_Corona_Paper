@@ -51,6 +51,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         cateringInput.setEditable(false);
         banner.setVisible(false);
         loggedIn = false;
+        sessionRunning=false;
 
     }
 
@@ -147,28 +148,37 @@ public class ClientGUI implements FocusListener, ActionListener {
                     JOptionPane.showMessageDialog(mainFrame, "An error while sending your QR code occured");
                     System.out.println("An error occured while parsing the QRcode");
                 } else {
-                    try {
-                        String result = this.v.readQr(qr);
-                        if (result != null) {
-                            confirmationCode.setText(result);
-                            sessionStatus.setText("Current session is: Running");
-                            sessionRunning = true;
-                            JOptionPane.showMessageDialog(mainFrame, "QR code sent!");
+                    if(!sessionRunning){
+                        try {
+                            String result = this.v.readQr(qr);
+                            if (result != null) {
+                                confirmationCode.setText(result);
+                                sessionStatus.setText("Current session is: Running");
+                                sessionRunning = true;
+                                JOptionPane.showMessageDialog(mainFrame, "QR code sent!");
+                                cateringInput.setEditable(false);
+                                sendCode.setText("Stop Session");
+                            }
+                        } catch (RemoteException remoteException) {
+                            remoteException.printStackTrace();
                         }
-                    } catch (RemoteException remoteException) {
-                        remoteException.printStackTrace();
                     }
+                    else{
+                        this.v.stopSession();
+                        sessionRunning=false;
+                        sessionStatus.setText("Current session is: Not Running");
+                        confirmationCode.setText("Session signature will come here");
+                        cateringInput.setEditable(true);
+                        sendCode.setText("Send QR");
+                    }
+
                 }
             }
-        } else if (e.getSource() == writeLogs) {
+        }
+        if (e.getSource() == writeLogs) {
             writeDownLogs();
         }
-        if (e.getSource() == stop) {
-            if (loggedIn && sessionRunning) {
-                this.v.stopSession();
-                sessionRunning = false;
-            }
-        }
+
     }
 
 
@@ -185,7 +195,7 @@ public class ClientGUI implements FocusListener, ActionListener {
     public void setView() {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         mainFrame.setBounds((int) toolkit.getScreenSize().getWidth() / 8, (int) toolkit.getScreenSize().getHeight() / 8, (int) toolkit.getScreenSize().getWidth() / 4, (int) toolkit.getScreenSize().getHeight() / 4);
-        Dimension d = new Dimension(100, 30);
+        Dimension d = new Dimension(150, 30);
         Dimension d2 = new Dimension(200, 30);
         login.setPreferredSize(d);
         sendCode.setPreferredSize(d);
@@ -196,7 +206,7 @@ public class ClientGUI implements FocusListener, ActionListener {
         GridBagLayout layout = new GridBagLayout();
         panel.setLayout(layout);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 10);
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -231,14 +241,14 @@ public class ClientGUI implements FocusListener, ActionListener {
         panel.add(confirmationCode, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 6;
-        panel.add(stop, gbc);
+        gbc.gridy = 5;
+        panel.add(sessionStatus, gbc);
 
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = 6;
         panel.add(informedSick, gbc);
 
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.gridy = 6;
         panel.add(writeLogs, gbc);
 

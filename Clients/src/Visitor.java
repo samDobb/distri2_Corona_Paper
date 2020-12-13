@@ -48,14 +48,13 @@ public class Visitor {
         this.username = username;
         this.telephoneNumber = telephoneNumber;
         this.gui=gui;
-
+        this.sessionRunning=false;
         qRcodes = new ArrayList<>();
         qRtimes = new ArrayList<>();
         signatures = new ArrayList<>();
         pastTokens=new ArrayList<>();
         logs=new ArrayList<>();
         activeTokens=new ArrayList<>();
-        tokenScheduler=new VisitorTokenScheduler(this);
         dayScheduler=new VisitorDayScheduler(this);
         timer=new Timer();
 
@@ -108,6 +107,10 @@ public class Visitor {
     public String readQr(QRcode qr) throws RemoteException {
         byte[]resp;
         String token;
+        if(sessionRunning){
+            System.out.println("A session is already running");
+            return null;
+        }
         if(!activeTokens.isEmpty()){
             qRcodes.add(qr);
             qRtimes.add(java.util.Calendar.getInstance());
@@ -119,7 +122,6 @@ public class Visitor {
             System.out.println("Remaining tokens: " + activeTokens.size());
             LocalDateTime Dbegin=LocalDateTime.now();
             LocalDateTime Dend=Dbegin.plusMinutes(30);
-
             resp=mixingProxy.sendCapsule(Dbegin,Dend,token,sign,qr.getEncodedLine(),publicKey);
         }
         else{
@@ -142,6 +144,7 @@ public class Visitor {
             //start schedule to send capsule each 30 minutes
             long tsec=tokenTime*60000;
             firstTokenSent=true;
+            tokenScheduler=new VisitorTokenScheduler(this);
             timer.schedule(tokenScheduler,0,tsec);
             currSesQR=qr;
             return sessionSign;
