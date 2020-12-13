@@ -1,10 +1,7 @@
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Date;
+
 
 public class ClientLog implements Serializable{
 

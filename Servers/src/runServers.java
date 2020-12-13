@@ -14,12 +14,12 @@ public class runServers {
         MixingProxyIMP mixingService=new MixingProxyIMP();
         RegistrarIMP registrarService=new RegistrarIMP();
         matchingService.connectRegister();
-        MatchingScheduler mT=new MatchingScheduler(matchingService);
+        //MatchingScheduler mT=new MatchingScheduler(matchingService);
 
         LocalDateTime start=  LocalDateTime.now();
         Timer t= new Timer();
-        TimerTask task = mT;
-        t.schedule(task,1000,5000);
+        //TimerTask task = mT;
+       // t.schedule(task,1000,5000);
        /* LocalDateTime prevTime=  LocalDateTime.now();
         while (true){
             LocalDateTime nextTime= prevTime.minusDays(1);

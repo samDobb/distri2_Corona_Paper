@@ -76,6 +76,12 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
 
     //getting the logs from the practitioner and searching for the critical entry
     public boolean getCriticalLogs(List<ClientLog> logs) throws RemoteException {
+
+        entries.add(new Capsule(LocalDateTime.now(),LocalDateTime.now().plusDays(1),"hash","token"));
+        entries.add(new Capsule(LocalDateTime.now(),LocalDateTime.now().plusDays(2),"hash","token2"));
+        entries.add(new Capsule(LocalDateTime.now(),LocalDateTime.now().plusDays(3),"hash","token3"));
+        entries.add(new Capsule(LocalDateTime.now(),LocalDateTime.now().plusDays(4),"hash","token4"));
+
         try {
             for (ClientLog log : logs) {
                 //validating the log
@@ -92,6 +98,7 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                                 if(entry.getInformed()) {
                                     //if the token is the same then the user is already informed
                                     if (log.getToken().equals(entry.getToken())) {
+                                        System.out.println("token is hetzelfd");
                                         entry.setInformed(true);
                                     }
                                     criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getHash()));
@@ -110,34 +117,31 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     }
 
     //checks if the log is valid
-
     public boolean validateLog(ClientLog log) throws RemoteException, NoSuchAlgorithmException {
         LocalDateTime date = log.getEntryTime();
         int day=date.getDayOfMonth();
 
         List<PseuLocMessage> pseudonyms= registrar.sendPseudonyms(day);
 
-        byte[] logEncodedLine=log.getHash().getBytes(StandardCharsets.ISO_8859_1);
+        String logHash=log.getHash();
+
         int random = log.getRi();
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
 
+        System.out.println("pseu length: "+pseudonyms.size());
+
         //checking for every pseudonym if the newly made pseudonym
         for(PseuLocMessage pseu:pseudonyms){
+
             String line = new String(pseu.getPseudonym(), StandardCharsets.ISO_8859_1);
             line=random+line;
-            byte[] encodedLine = md.digest(line.getBytes());
-            boolean notMatching=false;
-            if(encodedLine.length==logEncodedLine.length){
-                for(int i=0;i<encodedLine.length;i++){
-                    if(encodedLine[i]!=logEncodedLine[i]){
-                        notMatching=true;
-                    }
 
-                }
-                if(!notMatching){
+            String hash = new String(md.digest(line.getBytes()),StandardCharsets.ISO_8859_1);
+
+            if(hash.equals(logHash)){
+                System.out.println("hash is equal");
                     return true;
-                }
             }
 
         }
