@@ -9,6 +9,7 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
 
     private List<Capsule> capsules;
     private PrivateKey privKey;
+    private PrivateKey RSAPrivKey;
 
     private MatchingService matchingService;
 
@@ -38,6 +39,11 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
             //Getting the privatekey from the key pair
             privKey = pair.getPrivate();
 
+            KeyPairGenerator keyPairGenRSA = KeyPairGenerator.getInstance("RSA");
+            keyPairGenRSA.initialize(2048,new SecureRandom());
+            KeyPair pairRSA = keyPairGenRSA.generateKeyPair();
+            RSAPrivKey=pairRSA.getPrivate();
+
             matchingService = (MatchingService) Naming.lookup("rmi://localhost/MatchingService");
 
         }
@@ -63,9 +69,9 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
                     capsules.add(new Capsule(startTime,endTime, encodedLine, token));
 
                     //creating the signature that will be send back
-                    Signature signBack = Signature.getInstance("SHA256withDSA");
+                    Signature signBack = Signature.getInstance("SHA256withRSA");
 
-                    signBack.initSign(privKey);
+                    signBack.initSign(RSAPrivKey);
 
                     //updating the signature with the given encoded line from the facility
                     signBack.update(encodedLine);
