@@ -235,7 +235,10 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             }
         }
 
-        if(!uninformedCrits.isEmpty())registrar.getCrits(uninformedCrits);
+        if(!uninformedCrits.isEmpty()){
+            registrar.getCrits(uninformedCrits);
+            uninformedCrits.clear();
+        }
     }
     public void testTimer(){
         System.out.println("Timer triggerd Matching service");
