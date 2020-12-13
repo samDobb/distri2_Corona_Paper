@@ -12,6 +12,10 @@ public class PerDayScheduler extends TimerTask {
     @Override
     public void run(){
 
+        //remove keys of the day
+        mx.removeAllPublicKeys();
+        //remove overtime capsules
+        m.removeCapsules();
         try {
             mx.flush();
         } catch (RemoteException e) {

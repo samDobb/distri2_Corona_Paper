@@ -54,9 +54,11 @@ public class Visitor {
         signatures = new ArrayList<>();
         pastTokens=new ArrayList<>();
         logs=new ArrayList<>();
+        activeTokens=new ArrayList<>();
         tokenScheduler=new VisitorTokenScheduler(this);
         dayScheduler=new VisitorDayScheduler(this);
         timer=new Timer();
+
     }
 
     public String getUsername(){
@@ -81,6 +83,7 @@ public class Visitor {
                 registrar.enrollNewUser(details);
                 //execute certain functions every day
                 timer.schedule(dayScheduler,0,86400000);
+
                 return true;
             }
             else{

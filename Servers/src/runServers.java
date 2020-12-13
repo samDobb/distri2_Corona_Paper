@@ -18,26 +18,9 @@ public class runServers {
         //Schedulers
         PerDayScheduler perDay=new PerDayScheduler(matchingService,mixingService);
         LocalDateTime start=  LocalDateTime.now();
+        System.out.println(start.toString());
         Timer t= new Timer();
-        t.schedule(perDay,1000,86400000);
-       /* LocalDateTime prevTime=  LocalDateTime.now();
-        while (true){
-            LocalDateTime nextTime= prevTime.minusDays(1);
+        t.schedule(perDay,0,86400000);
 
-            if(prevTime.isAfter(nextTime)){
-                prevTime=LocalDateTime.now();
-
-                mixingService.flush();
-
-                matchingService.contactUninformed();
-
-                try {
-                    matchingService.checkEntries();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }*/
     }
 }

@@ -16,6 +16,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +79,16 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             entries.remove(entry);
         }
 
+    }
+    public void removeCapsules(){
+        LocalDateTime today=java.time.LocalDateTime.now();
+        for(int i=0;i<entries.size();i++){
+            Capsule c=entries.get(i);
+            long diff = Math.abs(c.getStartTime().until(today, ChronoUnit.DAYS));
+            if(diff>entryTime){
+                entries.remove(c);
+            }
+        }
     }
 
     //getting the logs from the practitioner and searching for the critical entry

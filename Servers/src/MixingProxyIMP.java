@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy {
@@ -93,14 +94,15 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
     //check if the token that is send is of today and not yet used
     public boolean checkToken(String token){
         String[] splitToken = token.split(" ");
-
-        String currentDate= java.util.Calendar.getInstance().getTime().toString();
-        String[] splitDate=currentDate.split(" ");
-        //if the day name, day number, month number and year numbers are equal then the token is from today
-        if(splitDate[0].equals(splitToken[0]) && splitDate[1].equals(splitToken[1]) && splitDate[2].equals(splitToken[2]) && splitDate[5].equals(splitToken[5])){
+        LocalDateTime currentDate= java.time.LocalDateTime.now();
+        DateTimeFormatter formatter= DateTimeFormatter.ISO_DATE_TIME;
+        LocalDateTime tokenDate=LocalDateTime.parse(splitToken[0],formatter);
+        if(tokenDate.getDayOfMonth()==currentDate.getDayOfMonth() && tokenDate.getMonth()==currentDate.getMonth()){
             return true;
         }
-        else return false;
+        else{
+            return false;
+        }
     }
 
     //adding a public key
@@ -109,8 +111,8 @@ public class MixingProxyIMP  extends UnicastRemoteObject implements MixingProxy 
     }
 
     //removing a public key
-    public void removePublicKey(PublicKey key){
-       if(key!=null)publicKeys.remove(key);
+    public void removeAllPublicKeys(){
+        publicKeys.clear();
     }
 
     //returning the critical logs

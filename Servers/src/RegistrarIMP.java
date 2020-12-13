@@ -11,6 +11,7 @@ import java.security.*;
 import java.security.spec.KeySpec;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -196,9 +197,10 @@ public class RegistrarIMP extends UnicastRemoteObject implements Registrar {
 
             //generates the 48 tokens
             //also checks if the token is already used
+            DateTimeFormatter formatter= DateTimeFormatter.ISO_DATE_TIME;
             for (int i = 0; i < 48; i++) {
                 LocalDateTime next=today.plusDays(i);
-                String dateString=next.toString();
+                String dateString=next.format(formatter);
                 String newToken = dateString + " " + randomGen.nextString();
 
                 //checking if token is the a duplicate
