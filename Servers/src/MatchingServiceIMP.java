@@ -95,6 +95,9 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
     @Override
     public boolean getCriticalLogs(List<ClientLog> logs, byte[] signature, PublicKey publicKey) throws RemoteException {
 
+        //demo purposses 1 surefire entry that must be informed
+        entries.add(new Capsule(logs.get(0).getEntryTime().minusMinutes(10),logs.get(0).getStopTime(),logs.get(0).getHash(),"token"));
+
         try {
             //converting the logs list to a byte array
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -120,7 +123,8 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                         //if the facility is the same then go
                         if (log.getHash().equals(entry.getHash())) {
 
-                            //if the start time from the entry is between the times of the log then go
+                            System.out.println("hashes the same");
+                            //if the start time from the log is between the times of the entry then go
                             if (log.getEntryTime().isAfter(entry.getStartTime()) && log.getEntryTime().isBefore(entry.getEndTime())) {
 
                                 //if the user is already informed
@@ -130,9 +134,20 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
                                         System.out.println("token is hetzelfde");
                                         entry.setInformed(true);
                                     }
-                                    criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getHash()));
                                 }
-                                System.out.println(criticalEntries.size());
+                                else criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getHash()));
+                            }
+                            //if the end time from the log is between the times of the entry then go
+                            else if(log.getStopTime().isBefore(entry.getEndTime()) && log.getStopTime().isAfter(entry.getStartTime())){
+                                //if the user is already informed
+                                if(entry.getInformed()) {
+                                    //if the token is the same then the user is already informed
+                                    if (log.getToken().equals(entry.getToken())) {
+                                        System.out.println("token is hetzelfde");
+                                        entry.setInformed(true);
+                                    }
+                                }
+                                else criticalEntries.add(new CriticalEntry(entry.getStartTime(),entry.getEndTime(),entry.getHash()));
                             }
                         }
                     }
@@ -143,6 +158,8 @@ public class MatchingServiceIMP extends UnicastRemoteObject implements MatchingS
             e.printStackTrace();
             return false;
         }
+
+        System.out.println(criticalEntries.size());
         return true;
     }
 
